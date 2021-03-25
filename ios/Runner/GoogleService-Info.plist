@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>821054410595-vh2md2f8igukn176asqiokh09o0624lq.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.821054410595-vh2md2f8igukn176asqiokh09o0624lq</string>
+	<key>ANDROID_CLIENT_ID</key>
+	<string>821054410595-8b6md5d7gsb5m2fgov24pml7sdf9mcff.apps.googleusercontent.com</string>
+	<key>API_KEY</key>
+	<string>AIzaSyDTzf9e5-2QT2xI6mgXQlWwzpoiayDpg94</string>
+	<key>GCM_SENDER_ID</key>
+	<string>821054410595</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.sloff</string>
+	<key>PROJECT_ID</key>
+	<string>sloff-1c2f2</string>
+	<key>STORAGE_BUCKET</key>
+	<string>sloff-1c2f2.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:821054410595:ios:edb9b6d182b412aa7a8d56</string>
+	<key>DATABASE_URL</key>
+	<string>https://sloff-1c2f2.firebaseio.com</string>
+</dict>
+</plist>
