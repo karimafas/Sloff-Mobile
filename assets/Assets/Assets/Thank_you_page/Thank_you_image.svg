@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="332" height="132" viewBox="0 0 332 132">
+  <defs>
+    <clipPath id="clip-path">
+      <path id="Rettangolo_253" data-name="Rettangolo 253" d="M6,0H326a6,6,0,0,1,6,6V132a0,0,0,0,1,0,0H0a0,0,0,0,1,0,0V6A6,6,0,0,1,6,0Z" transform="translate(22 111)" fill="#190e3b"/>
+    </clipPath>
+  </defs>
+  <g id="Thank_you_image" transform="translate(-22 -111)">
+    <path id="Rettangolo_243" data-name="Rettangolo 243" d="M6,0H326a6,6,0,0,1,6,6V132a0,0,0,0,1,0,0H0a0,0,0,0,1,0,0V6A6,6,0,0,1,6,0Z" transform="translate(22 111)" fill="#190e3b"/>
+    <g id="IMAGE" clip-path="url(#clip-path)">
+      <path id="bolla" d="M54.715,4.521C70.724,2.906,80.856,7.31,90.727,17.456c9.332,9.592,17.621,20.287,17.621,34.877,0,15.629-5.079,26.387-15.844,36.329-9.467,8.744-16.761,13.705-30.845,13.705-15.213,0-25.361-.243-35.244-10.5C17.185,82.3,9.162,71.745,9.162,57.245c0-14.173,4.236-24.421,13.289-34.132C32.177,12.678,37.084,6.533,54.715,4.521Z" transform="translate(128.746 123.719)" fill="#694eff"/>
+      <ellipse id="Ellisse_324" data-name="Ellisse 324" cx="61.5" cy="42.5" rx="61.5" ry="42.5" transform="translate(42 203)" fill="#ff6926"/>
+      <ellipse id="Ellisse_325" data-name="Ellisse 325" cx="47" cy="43.5" rx="47" ry="43.5" transform="translate(287 101)" fill="#694eff"/>
+      <rect id="Rettangolo_244" data-name="Rettangolo 244" width="13" height="13" transform="translate(102.168 141.615) rotate(-20)" fill="#fff"/>
+      <rect id="Rettangolo_245" data-name="Rettangolo 245" width="8" height="8" transform="translate(266.777 197.209) rotate(-8)" fill="#fff"/>
+      <rect id="Rettangolo_250" data-name="Rettangolo 250" width="12.459" height="12.459" transform="matrix(0.891, 0.454, -0.454, 0.891, 297.078, 162.698)" fill="#ff6926"/>
+      <rect id="Rettangolo_249" data-name="Rettangolo 249" width="4.621" height="4.621" transform="translate(77.031 172.658) rotate(-20)" fill="#ff6926"/>
+      <rect id="Rettangolo_252" data-name="Rettangolo 252" width="2.283" height="2.283" transform="translate(59.031 204.54) rotate(-20)" fill="#fff"/>
+      <rect id="Rettangolo_246" data-name="Rettangolo 246" width="8" height="8" rx="4" transform="translate(281.168 134.778) rotate(-20)" fill="#fff"/>
+      <rect id="Rettangolo_248" data-name="Rettangolo 248" width="10.329" height="10.329" rx="5.165" transform="translate(109.328 199.872) rotate(-20)" fill="#ff6926"/>
+      <rect id="Rettangolo_247" data-name="Rettangolo 247" width="3" height="3" rx="1.5" transform="translate(48.879 143.681) rotate(-20)" fill="#ff6926"/>
+      <rect id="Rettangolo_251" data-name="Rettangolo 251" width="3" height="3" rx="1.5" transform="translate(324.006 217.873) rotate(-20)" fill="#ff6926"/>
+    </g>
+  </g>
+</svg>

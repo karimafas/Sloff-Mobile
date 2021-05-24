@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="332" height="149" viewBox="0 0 332 149">
+  <defs>
+    <clipPath id="clip-path">
+      <path id="Rettangolo_253" data-name="Rettangolo 253" d="M6,0H326a6,6,0,0,1,6,6V132a0,0,0,0,1,0,0H0a0,0,0,0,1,0,0V6A6,6,0,0,1,6,0Z" transform="translate(22 111)" fill="#190e3b"/>
+    </clipPath>
+  </defs>
+  <g id="Image" transform="translate(-22 -111)">
+    <path id="Rettangolo_243" data-name="Rettangolo 243" d="M6,0H326a6,6,0,0,1,6,6V132a0,0,0,0,1,0,0H0a0,0,0,0,1,0,0V6A6,6,0,0,1,6,0Z" transform="translate(22 111)" fill="#fff8ed"/>
+    <g id="Inbuto" transform="translate(-49.127 22.924)">
+      <path id="Tracciato_2242" data-name="Tracciato 2242" d="M38.792,0,77.7,60.965,0,62.689Z" transform="translate(188.081 237.076) rotate(-129)" fill="#694eff"/>
+      <ellipse id="Ellisse_348" data-name="Ellisse 348" cx="20.387" cy="40.774" rx="20.387" ry="40.774" transform="translate(174.417 145.886) rotate(-40)" fill="#2a1986"/>
+    </g>
+    <g id="IMAGE-2" data-name="IMAGE" clip-path="url(#clip-path)">
+      <ellipse id="Ellisse_324" data-name="Ellisse 324" cx="61.5" cy="42.5" rx="61.5" ry="42.5" transform="translate(59.484 136.354) rotate(82)" fill="#694eff"/>
+      <ellipse id="Ellisse_325" data-name="Ellisse 325" cx="47" cy="43.5" rx="47" ry="43.5" transform="translate(287 101)" fill="#ff6926"/>
+      <rect id="Rettangolo_249" data-name="Rettangolo 249" width="4.621" height="4.621" transform="translate(214.031 198.619) rotate(-20)" fill="#694eff"/>
+      <rect id="Rettangolo_316" data-name="Rettangolo 316" width="4.621" height="4.621" transform="translate(233.065 174.606) rotate(24)" fill="#190e3b"/>
+      <rect id="Rettangolo_321" data-name="Rettangolo 321" width="4.621" height="4.621" transform="translate(157.113 131.25) rotate(-25)" fill="#ff6926"/>
+      <rect id="Rettangolo_317" data-name="Rettangolo 317" width="4.621" height="4.621" transform="matrix(0.839, 0.545, -0.545, 0.839, 165.728, 196.803)" fill="#fff"/>
+      <rect id="Rettangolo_252" data-name="Rettangolo 252" width="2.283" height="2.283" transform="translate(173.797 176.974) rotate(-20)" fill="#fff"/>
+      <rect id="Rettangolo_246" data-name="Rettangolo 246" width="5.046" height="5.046" rx="2.523" transform="translate(178.256 148.554) rotate(-20)" fill="#190e3b"/>
+      <rect id="Rettangolo_248" data-name="Rettangolo 248" width="10.329" height="10.329" rx="5.165" transform="translate(178.021 196.913) rotate(-20)" fill="#ff6926"/>
+      <rect id="Rettangolo_247" data-name="Rettangolo 247" width="3" height="3" rx="1.5" transform="translate(201.032 171.876) rotate(-20)" fill="#ff6926"/>
+      <rect id="Rettangolo_319" data-name="Rettangolo 319" width="1.262" height="1.262" rx="0.631" transform="translate(223.665 131.275) rotate(-20)" fill="#ff6926"/>
+      <rect id="Rettangolo_251" data-name="Rettangolo 251" width="3" height="3" rx="1.5" transform="translate(152.006 183.036) rotate(-20)" fill="#ff6926"/>
+      <rect id="Rettangolo_320" data-name="Rettangolo 320" width="2" height="2" rx="1" transform="translate(155.851 164.916) rotate(-20)" fill="#fff"/>
+      <path id="Coupon" d="M-2284.222-14757.205H-2300a1,1,0,0,1-1-1v-1.894a1.986,1.986,0,0,0,1.987-1.979,1.985,1.985,0,0,0-1.987-1.979V-14766a1,1,0,0,1,1-1h15.777a1,1,0,0,1,1,1v1.946a1.984,1.984,0,0,0-1.986,1.979,1.985,1.985,0,0,0,1.986,1.979v1.894A1,1,0,0,1-2284.222-14757.205Z" transform="translate(196.958 15148.109) rotate(9)" fill="#190e3b"/>
+      <path id="Coupon-2" data-name="Coupon" d="M-2284.222-14757.205H-2300a1,1,0,0,1-1-1v-1.894a1.986,1.986,0,0,0,1.987-1.979,1.985,1.985,0,0,0-1.987-1.979V-14766a1,1,0,0,1,1-1h15.777a1,1,0,0,1,1,1v1.946a1.984,1.984,0,0,0-1.986,1.979,1.985,1.985,0,0,0,1.986,1.979v1.894A1,1,0,0,1-2284.222-14757.205Z" transform="translate(13598.186 6712.185) rotate(-55)" fill="#190e3b"/>
+      <path id="Coupon-3" data-name="Coupon" d="M-2277.877-14753.707H-2300a1,1,0,0,1-1-1v-2.924a2.7,2.7,0,0,0,2.7-2.687,2.7,2.7,0,0,0-2.7-2.687v-3a1,1,0,0,1,1-1h22.121a1,1,0,0,1,1,1v3a2.694,2.694,0,0,0-2.694,2.687,2.693,2.693,0,0,0,2.694,2.687v2.924A1,1,0,0,1-2277.877-14753.707Z" transform="translate(9192.947 12104.976) rotate(-28)" fill="#ff6926"/>
+      <path id="Coupon-4" data-name="Coupon" d="M-2290.055-14760.692H-2300.5a.5.5,0,0,1-.5-.5v-1.36a1.278,1.278,0,0,0,1.279-1.274,1.278,1.278,0,0,0-1.279-1.274v-1.4a.5.5,0,0,1,.5-.5h10.444a.5.5,0,0,1,.5.5v1.4a1.278,1.278,0,0,0-1.279,1.274,1.278,1.278,0,0,0,1.279,1.274v1.36A.5.5,0,0,1-2290.055-14760.692Z" transform="translate(12417.609 8756.917) rotate(-46)" fill="#694eff"/>
+    </g>
+  </g>
+</svg>

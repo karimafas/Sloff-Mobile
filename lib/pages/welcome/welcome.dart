@@ -1,3 +1,4 @@
+/*
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter/rendering.dart';
@@ -35,9 +36,11 @@ class _Welcome extends State<Welcome> with WidgetsBindingObserver{
   RiveAnimationController _controller;
 
 
-  /*'assets/images/sloff_divano.riv'
+  */
+/*'assets/images/sloff_divano.riv'
     'assets/images/sloff_lavora.riv'
-    'assets/images/sloff_salva_pianeta.riv'*/
+    'assets/images/sloff_salva_pianeta.riv'*//*
+
   var image =[
     'assets/images/On_boarding/Sloff_img1.svg',
     'assets/images/On_boarding/Sloff_img2.svg',
@@ -55,7 +58,7 @@ class _Welcome extends State<Welcome> with WidgetsBindingObserver{
 
   Future<String> _check () async {
 
-    await precachePicture(ExactAssetPicture(SvgPicture.svgStringDecoder, 'assets/images/Coupon/Coupon.svg'), context,);
+    await precachePicture(ExactAssetPicture(SvgPicture.svgStringDecoder, 'assets/images/Cause/1.jpeg'), context,);
     await precachePicture(ExactAssetPicture(SvgPicture.svgStringDecoder, 'assets/images/Coupon/Coupon_da_riscattare.svg'), context,);
     await precachePicture(ExactAssetPicture(SvgPicture.svgStringDecoder, 'assets/images/Coupon/Coupon_grigio.svg'), context,);
     await precachePicture(ExactAssetPicture(SvgPicture.svgStringDecoder, 'assets/images/Coupon/Riscatta_coupon.svg'), context,);
@@ -107,26 +110,22 @@ class _Welcome extends State<Welcome> with WidgetsBindingObserver{
 
     rootBundle.load('assets/images/sloff_divano.riv').then(
           (data) async {
-        final file = RiveFile();
+            final file = RiveFile.import(data);
 
-        // Load the RiveFile from the binary data.
-        if (file.import(data)) {
-          // The artboard is the root of the animation and gets drawn in the
-          // Rive widget.
-          final artboard = file.mainArtboard;
-          // Add a controller to play back a known animation on the main/default
-          // artboard.We store a reference to it so we can toggle playback.
-          artboard.addController(_controller = SimpleAnimation('Untitled 1'));
-          setState(() => _riveArtboard1 = artboard);
-        }
-      },
+            // The artboard is the root of the animation and gets drawn in the
+            // Rive widget.
+            final artboard = file.mainArtboard;
+            // Add a controller to play back a known animation on the main/default
+            // artboard.We store a reference to it so we can toggle playback.
+            artboard.addController(_controller = SimpleAnimation('Untitled 1'));
+            setState(() => _riveArtboard1 = artboard);
+          }
     );
     rootBundle.load('assets/images/sloff_lavora.riv').then(
           (data) async {
-        final file = RiveFile();
+        final file = RiveFile.import(data);
 
         // Load the RiveFile from the binary data.
-        if (file.import(data)) {
           // The artboard is the root of the animation and gets drawn in the
           // Rive widget.
           final artboard = file.mainArtboard;
@@ -135,14 +134,11 @@ class _Welcome extends State<Welcome> with WidgetsBindingObserver{
           artboard.addController(_controller = SimpleAnimation('Untitled 1'));
           setState(() => _riveArtboard2 = artboard);
         }
-      },
     );
     rootBundle.load('assets/images/sloff_salva_pianeta.riv').then(
           (data) async {
-        final file = RiveFile();
+        final file = RiveFile.import(data);
 
-        // Load the RiveFile from the binary data.
-        if (file.import(data)) {
           // The artboard is the root of the animation and gets drawn in the
           // Rive widget.
           final artboard = file.mainArtboard;
@@ -151,7 +147,6 @@ class _Welcome extends State<Welcome> with WidgetsBindingObserver{
           artboard.addController(_controller = SimpleAnimation('Untitled 1'));
           setState(() => _riveArtboard3 = artboard);
         }
-      },
     );
      texts =[<TextSpan>[
       new TextSpan(text: 'welcome'.tr(namedArgs: {'utente': widget.utente}), style: new TextStyle(fontWeight: FontWeight.bold, fontFamily: 'Montserrat', fontSize: 24, color: Colors.black)),
@@ -218,7 +213,8 @@ class _Welcome extends State<Welcome> with WidgetsBindingObserver{
                               Column(crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
                                   SvgPicture.asset(image[i-1]),
-                                /*Container(
+                                */
+/*Container(
                                     width: MediaQuery.of(context).size.width*1,
                                 height: 600,
                                 child:
@@ -231,7 +227,8 @@ class _Welcome extends State<Welcome> with WidgetsBindingObserver{
                                     //SvgPicture.asset('assets/images/Home/Terra.svg')
                                     //FlareActor('assets/images/Sloff_lavora.json', animation: 'idle',)
                                   ),
-                                )),*/
+                                )),*//*
+
                                 Center(child:
                                 new RichText(
                                     textAlign: TextAlign.center,
@@ -319,12 +316,14 @@ class _Welcome extends State<Welcome> with WidgetsBindingObserver{
              elevation: 10,
              child:Scaffold(
                backgroundColor: Colors.transparent,
-               /*appBar: new AppBar(backgroundColor: Colors.white,
+               */
+/*appBar: new AppBar(backgroundColor: Colors.white,
                    automaticallyImplyLeading: false,
                  leading: new IconButton(
                  icon: new Icon(Icons.clear, color: Colors.black),
                  onPressed: () => Navigator.of(context).pop(),
-               ), ),*/
+               ), ),*//*
+
              body:SingleChildScrollView(child:
             Container(
               padding: EdgeInsets.only(top: 50),
@@ -508,3 +507,4 @@ class _Welcome extends State<Welcome> with WidgetsBindingObserver{
 
 
 
+*/

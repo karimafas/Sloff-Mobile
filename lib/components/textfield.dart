@@ -136,25 +136,6 @@ class _TheTextfield extends State<TheTextfield>{
                   controller: widget.controller,
                   obscureText: widget.ispass?true:false,
                   focusNode: f1,
-                  onChanged: (String newVal) {
-                    /*if(newVal.isNotEmpty){
-                      setState(() {
-                        widget.active = true;
-
-                      });
-                    }else if(f1.hasFocus){
-                      setState(() {
-                        widget.active = true;
-
-                      });
-                    }else{
-                      setState(() {
-                        widget.active = false;
-
-                      });
-                    }*/
-
-                  },
                 decoration: InputDecoration.collapsed(),
               ),)
             ),

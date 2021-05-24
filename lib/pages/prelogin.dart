@@ -1,9 +1,17 @@
+import 'dart:ui';
 
+import 'package:carousel_slider/carousel_slider.dart';
+import 'package:dots_indicator/dots_indicator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:sloff/components/Animations.dart';
+import 'package:sloff/components/Background.dart';
+import 'package:sloff/components/FadeNavigation.dart';
 import 'package:sloff/main.dart';
+import 'package:sloff/pages/SignUp.dart';
+import 'package:sloff/pages/onboarding/Onboarding.dart';
 import 'package:toast/toast.dart';
-import'package:sloff/pages/homepage.dart';
+import 'package:sloff/pages/homepage.dart';
 import 'package:sloff/pages/welcome/welcome.dart';
 
 import 'package:flutter/rendering.dart';
@@ -39,13 +47,14 @@ class PreLogin extends StatefulWidget {
   _PreLogin createState() => _PreLogin();
 }
 
-class _PreLogin extends State<PreLogin>
-    with SingleTickerProviderStateMixin {
+class _PreLogin extends State<PreLogin> with SingleTickerProviderStateMixin {
   AnimationController _controller;
   Animation<Offset> _offsetFloat;
-  Color selected=Colors.blue;
+  Color selected = Colors.blue;
   GoogleSignInAccount googleAccount;
   final GoogleSignIn googleSignIn = new GoogleSignIn();
+  int _currentIndex = 0;
+  CarouselController _carouselController = new CarouselController();
 
   @override
   void initState() {
@@ -54,7 +63,6 @@ class _PreLogin extends State<PreLogin>
     _controller = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 200),
-
     );
 
     _offsetFloat = Tween<Offset>(
@@ -64,7 +72,6 @@ class _PreLogin extends State<PreLogin>
       CurvedAnimation(
         parent: _controller,
         curve: Curves.ease,
-
       ),
     );
 
@@ -72,6 +79,7 @@ class _PreLogin extends State<PreLogin>
       setState(() {});
     });
   }
+
   Future<SharedPreferences> setSharedPref() async {
     return await SharedPreferences.getInstance();
   }
@@ -85,275 +93,289 @@ class _PreLogin extends State<PreLogin>
     return account;
   }
 
-  void _getSignedInAccount() async {
+/*  void _getSignedInAccount() async {
     if (googleAccount == null) {
       googleAccount = await googleSignIn.signIn();
     }
     googleAccount = await getSignedInAccount(googleSignIn);
     if (googleAccount != null) {
       final GoogleSignInAuthentication googleAuth =
-      await googleAccount.authentication;
+          await googleAccount.authentication;
       final AuthCredential credential = GoogleAuthProvider.credential(
         accessToken: googleAuth.accessToken,
         idToken: googleAuth.idToken,
       );
 
-
       FirebaseAuth.instance.signInWithCredential(credential).then((user) async {
-
         if (user != null) {
-          QuerySnapshot doc =  await FirebaseFirestore.instance.collection('users').where("email", isEqualTo: user.user.email).get();
-          if(doc.docs.length==0){
-            Toast.show("Il tuo indirizzo email non è collegato a nessuna azienda", context);
-          }else{
-          if(doc.docs[0].get('last_login')==''){
-            String uuid = doc.docs[0].id;
-            String company =doc.docs[0].get('company');
-            print('TEST ENTER');
-            FirebaseFirestore.instance.collection('users').doc(uuid).update({
-              "last_login": DateTime.now().millisecondsSinceEpoch,
-              "last_app_usage": DateTime.now().millisecondsSinceEpoch,
-            }).then((value) async {
-              FirebaseFirestore.instance.collection('focus').doc(uuid).set({
-                "total": 0,
-                "available": 0,
+          QuerySnapshot doc = await FirebaseFirestore.instance
+              .collection('users')
+              .where("email", isEqualTo: user.user.email)
+              .get();
+          if (doc.docs.length == 0) {
+            Toast.show(
+                "Il tuo indirizzo email non è collegato a nessuna azienda",
+                context);
+          } else {
+            if (doc.docs[0].get('last_login') == '') {
+              String uuid = doc.docs[0].id;
+              String company = doc.docs[0].get('company');
+              print('TEST ENTER');
+              FirebaseFirestore.instance.collection('users').doc(uuid).update({
+                "last_login": DateTime.now().millisecondsSinceEpoch,
+                "last_app_usage": DateTime.now().millisecondsSinceEpoch,
               }).then((value) async {
-                FirebaseFirestore.instance.collection('users_company').doc(company).collection('focus').doc(uuid).set({
+                FirebaseFirestore.instance.collection('focus').doc(uuid).set({
                   "total": 0,
                   "available": 0,
                 }).then((value) async {
-                  FirebaseFirestore.instance.collection('users_company').doc(company).collection('users').doc(uuid).update({
-                    "last_login": DateTime.now().millisecondsSinceEpoch,
-                    "last_app_usage": DateTime.now().millisecondsSinceEpoch,
-                    "uuid":uuid
+                  FirebaseFirestore.instance
+                      .collection('users_company')
+                      .doc(company)
+                      .collection('focus')
+                      .doc(uuid)
+                      .set({
+                    "total": 0,
+                    "available": 0,
                   }).then((value) async {
-                    if (true) {
-                      //sharedPref.setBool('isFirst', true);
-                      SharedPreferences prefs = await SharedPreferences.getInstance();
-                      await prefs.setString('uuid', uuid);
-                      await prefs.setString('company', company);
-                      Navigator.of(context).pushAndRemoveUntil(
-                          MaterialPageRoute<void>(
-                            builder: (BuildContext context) => Welcome(
-                              utente: user.user.displayName,
+                    FirebaseFirestore.instance
+                        .collection('users_company')
+                        .doc(company)
+                        .collection('users')
+                        .doc(uuid)
+                        .update({
+                      "last_login": DateTime.now().millisecondsSinceEpoch,
+                      "last_app_usage": DateTime.now().millisecondsSinceEpoch,
+                      "uuid": uuid
+                    }).then((value) async {
+                      if (true) {
+                        //sharedPref.setBool('isFirst', true);
+                        SharedPreferences prefs =
+                            await SharedPreferences.getInstance();
+                        await prefs.setString('uuid', uuid);
+                        await prefs.setString('company', company);
+                        Navigator.of(context).pushAndRemoveUntil(
+                            MaterialPageRoute<void>(
+                              builder: (BuildContext context) => Welcome(
+                                utente: user.user.displayName,
+                              ),
                             ),
-                          ),
-                              (Route<dynamic> route) => false);
-                    }
-                  });
-
-                });
-
-              });
-
-
-
-
-            });
-
-          }else{
-            String uuid = doc.docs[0].id;
-            String company =doc.docs[0].get('company');
-            print('TEST ENTER');
-            final DocumentReference postRef =
-            FirebaseFirestore.instance.collection('users').doc(uuid);
-            if (postRef != null) {
-              print("Getting post reference////// ${postRef.path}");
-              postRef
-                  .update({
-                "last_login": DateTime.now().millisecondsSinceEpoch,
-                "last_app_usage": DateTime.now().millisecondsSinceEpoch,
-                "version": Global.version,
-
-              }).then((value) async{
-                FirebaseFirestore.instance.collection('users_company').doc(company).collection('users').doc(uuid).update({
-                  "last_login": DateTime.now().millisecondsSinceEpoch,
-                  "last_app_usage": DateTime.now().millisecondsSinceEpoch,
-                }).then((value) async {
-                  final sharedPref = await setSharedPref();
-
-                  ///sharedPref.setBool(
-                  // AppStateModel.IS_AUDIO_BOOK_LOGIN, true);
-                  //sharedPref.setString(
-                  //  AppStateModel.LOGGED_IN_USER_ID, user.user.uid);
-                  if (true) {
-                    SharedPreferences prefs = await SharedPreferences.getInstance();
-                    await prefs.setString('uuid', uuid);
-                    await prefs.setString('company', company);
-
-                    Navigator.of(context).pushAndRemoveUntil(
-                        MaterialPageRoute<void>(
-                          builder: (BuildContext context) => HomeInitialPage(
-
-                          ),
-                        ),
                             (Route<dynamic> route) => false);
-                  }
+                      }
+                    });
+                  });
                 });
-
               });
             } else {
+              String uuid = doc.docs[0].id;
+              String company = doc.docs[0].get('company');
+              print('TEST ENTER');
+              final DocumentReference postRef =
+                  FirebaseFirestore.instance.collection('users').doc(uuid);
+              if (postRef != null) {
+                print("Getting post reference////// ${postRef.path}");
+                postRef.update({
+                  "last_login": DateTime.now().millisecondsSinceEpoch,
+                  "last_app_usage": DateTime.now().millisecondsSinceEpoch,
+                  "version": Global.version,
+                }).then((value) async {
+                  FirebaseFirestore.instance
+                      .collection('users_company')
+                      .doc(company)
+                      .collection('users')
+                      .doc(uuid)
+                      .update({
+                    "last_login": DateTime.now().millisecondsSinceEpoch,
+                    "last_app_usage": DateTime.now().millisecondsSinceEpoch,
+                  }).then((value) async {
+                    final sharedPref = await setSharedPref();
 
+                    ///sharedPref.setBool(
+                    // AppStateModel.IS_AUDIO_BOOK_LOGIN, true);
+                    //sharedPref.setString(
+                    //  AppStateModel.LOGGED_IN_USER_ID, user.user.uid);
+                    if (true) {
+                      SharedPreferences prefs =
+                          await SharedPreferences.getInstance();
+                      await prefs.setString('uuid', uuid);
+                      await prefs.setString('company', company);
+
+                      Navigator.of(context).pushAndRemoveUntil(
+                          MaterialPageRoute<void>(
+                            builder: (BuildContext context) =>
+                                HomeInitialPage(),
+                          ),
+                          (Route<dynamic> route) => false);
+                    }
+                  });
+                });
+              } else {}
             }
           }
-
-          }
-          }
+        }
       });
-
     }
-  }
+  }*/
 
   final Shader linearGradient = LinearGradient(
-    colors: <Color>[Color(0xffbef00), Color(0xff10eb50), Color(0xff08b9ff), Color(0xff0f80ff),
-      Color(0xff9e06db), Color(0xffff0f5f), Color(0xffFF7E05), Color(0xffFAFA19)],
+    colors: <Color>[
+      Color(0xffbef00),
+      Color(0xff10eb50),
+      Color(0xff08b9ff),
+      Color(0xff0f80ff),
+      Color(0xff9e06db),
+      Color(0xffff0f5f),
+      Color(0xffFF7E05),
+      Color(0xffFAFA19)
+    ],
   ).createShader(Rect.fromLTWH(0.0, 0.0, 250.0, 70.0));
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      body:
-
-      Container(padding: EdgeInsets.all(30),
-          child:Center(child:
-          Column(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              //Container(
-              //height: 80,
-              //child:
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                //crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  //SvgPicture.asset('assets/images/Accedi/Sloth.svg'),
-
-                  SvgPicture.asset('assets/images/Accedi/Sloth.svg'),
-                  //Container(width: 120,),
-                  //SvgPicture.asset('assets/images/Accedi/SLOFF.svg')
-                  Container(
-                      width: 150,
-                      child:
-                      SvgPicture.asset('assets/images/Accedi/SLOFF.svg')),
-
-                ],),//),
-              new RichText(
-                textAlign: TextAlign.center,
-                text: new TextSpan(
-                  text: 'Your focus for\n',
-                  style: TextStyle(
-                      letterSpacing: -0.8,
-                      color: Colors.black,
-                      fontSize: 30.0,
-                      fontWeight: FontWeight.bold,
-                      fontFamily: 'Montserrat'
-                  ),
-                  children: <TextSpan>[
-                    new TextSpan(text: 'Earthcare', style: new  TextStyle(
-                      fontSize: 30.0,
-                      fontWeight: FontWeight.bold,
-                      foreground: Paint()..shader = linearGradient,
-                    )),
+      body: Stack(
+        children: [
+          Container(color: new Color(0xFFFFF8ED)),
+          Background(page: 1),
+          BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 70, sigmaY: 70),
+            child: Center(
+                child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                Row(
+                  children: [
+                    Container(height: 20)
                   ],
                 ),
-              ),
-              /* Text('Earthcare',
-            style: TextStyle(
-                fontSize: 30.0,
-                fontWeight: FontWeight.bold
-            ),),
-          ColorizeAnimatedTextKit(
-              onTap: () {
-                print("Tap Event");
-              },
-              text: [
-                "Earthcare",
-              ],
-              //repeatForever: true,
-              //isRepeatingAnimation: true,
-              speed: Duration(milliseconds: 3000),
-              textStyle: TextStyle(
-                  fontSize: 30.0,
-                  fontWeight: FontWeight.bold
-              ),
-              colors: [
-                //Colors.purple,
-                Colors.blue,
-                Colors.yellow,
-                Colors.red,
-                Colors.yellow,
-                Colors.blue,
-              ],
-              textAlign: TextAlign.start,
-              alignment: AlignmentDirectional.topStart // or Alignment.topLeft
-          ),*/
-              Container(height: 10,),
-              /*Text('welcome_ut',
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 16.0,
-          ),).tr(),
-          Container(height: 10,),
-
-          Text('welcome_ut1',
-            textAlign: TextAlign.center,
-            style: TextStyle(
-            fontSize: 16.0,
-          ),).tr(),*/
-              Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  GestureDetector(onTap: (){
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => Login(registrati: true,))
-                    );
-
-                  },
-                      child:RectangleButton(text: ('registrati').tr().toUpperCase(),  mini: true, type: 6)),
-                  GestureDetector(onTap: (){
-                    _getSignedInAccount();
-
-                  },
-                    child:
-                    RectangleButton(text: ('accedigoogle').tr(), type: 2, mini: true),
+                SlideYFadeInBottom(
+                  0.5, SizedBox(
+                      height: 35,
+                      child: SvgPicture.asset(
+                          'assets/images/Home/SLOFF_logo.svg')),
+                ),
+                Container(height: 10),
+                SlideYFadeIn(
+                  1, SizedBox(
+                    height: MediaQuery.of(context).size.height * 0.4,
+                    child: CarouselSlider(
+                      carouselController: _carouselController,
+                      options: CarouselOptions(
+                        initialPage: 0,
+                        onPageChanged: (index, reason) {
+                          setState(() {
+                            print(index);
+                            _currentIndex = index;
+                          });
+                        },
+                        autoPlayInterval: Duration(seconds: 10),
+                        autoPlay: true,
+                        viewportFraction: 1,
+                        aspectRatio: 16/9,
+                      ),
+                      items: [
+                        InfoPage(title: "welcome-1".tr(), text: "welcome-1_2".tr()),
+                        InfoPage(title: "welcome-2".tr(), text: "welcome-2_2".tr()),
+                        InfoPage(title: "welcome-3".tr(), text: "welcome-3_2".tr()),
+                        InfoPage(title: "welcome-4".tr(), text: "welcome-4_2".tr())
+                      ],
+                    ),
                   ),
-                  Center(child:
-                  Container(padding: EdgeInsets.only(top: 20, bottom: 27),
-                    child: Text('OPPURE',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        letterSpacing: -0.8,
-                        color: Colors.black,
-                        fontWeight: FontWeight.w500,
-                        fontSize: 15,
-                      ),),
+                ),
+                FadeIn(
+                  1.5, DotsIndicator(
+                    dotsCount: 4,
+                    position: _currentIndex.toDouble(),
+                    decorator: DotsDecorator(
+                      activeColor: new Color(0xFFFF6926),
+                      color: new Color(0xFFFFDFAD),
+                    ),
+                  ),
+                ),
+                Container(
+                  height: 10,
+                ),
+                Column(
+                  children: [
+                    GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => SignUp1(email: "")));
+                        },
+                        child: RectangleButton(
+                          color: new Color(0xFF694EFF),
+                          width: 350,
+                            text: ('registrati').tr().toUpperCase(),
+                            mini: true,
+                            type: 6)),
+                    GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => Login()));
+                        },
+                        child: Container(
+                          height: 54,
+                          width: 350,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(4),
+                            color: Colors.transparent,
+                            border: Border.all(color: new Color(0xFF190E3B), width: 2),
+                          ),
+                          child: Center(
+                            child: Text("accedi".tr().toUpperCase(), textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontFamily: 'Poppins-Regular',
+                                fontWeight: FontWeight.w600,
+                                color: new Color(0xFF190E3B),
+                                fontSize: 15,
+                              ),),
+                          ),
+                        )),
+                  ],
+                ),
+                GestureDetector(onTap: () {}, child: Container()),
+              ],
+            )),
+          ),
+        ],
+      ),
+    );
+  }
+}
 
-                  )),
-                  GestureDetector(onTap: (){
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => Login(registrati: false,))
-                    );
+class InfoPage extends StatelessWidget {
+  const InfoPage({
+    Key key, this.title, this.text,
+  }) : super(key: key);
+  final String title;
+  final String text;
 
-                  },
-                      child:RectangleButton(text: ('accedi').tr(),)),
-
-                ],),
-
-
-              GestureDetector(onTap: (){
-
-
-              },
-                  child:Container()),
-
-            ],
-
-          )
-          )),
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 40),
+      child: Column(
+        children: [
+          Text(title,
+              style: TextStyle(
+                  color: new Color(0xFF190E3B),
+                  fontSize: 33,
+                  fontFamily: 'GrandSlang'),
+              textAlign: TextAlign.center),
+          Container(height: 20),
+          Text(text,
+              style: TextStyle(
+                  color: new Color(0xFF190E3B),
+                  fontSize: 13,
+                  fontFamily: 'Poppins-Light'),
+              textAlign: TextAlign.center),
+        ],
+      ),
     );
   }
 }

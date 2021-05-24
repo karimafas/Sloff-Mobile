@@ -1,7 +1,5 @@
-//import 'package:sloff/values/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-
 
 class AnimatedRectangleButton extends StatefulWidget {
   final String text;
@@ -14,14 +12,15 @@ class AnimatedRectangleButton extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  _AnimatedRectangleButtonState createState() => _AnimatedRectangleButtonState();
+  _AnimatedRectangleButtonState createState() =>
+      _AnimatedRectangleButtonState();
 }
 
 class _AnimatedRectangleButtonState extends State<AnimatedRectangleButton>
     with SingleTickerProviderStateMixin {
   AnimationController _controller;
   Animation<Offset> _offsetFloat;
-  Color selected=Colors.blue;
+  Color selected = Colors.blue;
 
   @override
   void initState() {
@@ -30,7 +29,6 @@ class _AnimatedRectangleButtonState extends State<AnimatedRectangleButton>
     _controller = AnimationController(
       //vsync: this,
       duration: const Duration(milliseconds: 200),
-
     );
 
     _offsetFloat = Tween<Offset>(
@@ -40,7 +38,6 @@ class _AnimatedRectangleButtonState extends State<AnimatedRectangleButton>
       CurvedAnimation(
         parent: _controller,
         curve: Curves.ease,
-
       ),
     );
 
@@ -61,10 +58,6 @@ class _AnimatedRectangleButtonState extends State<AnimatedRectangleButton>
           //await _controller.forward();
           Future.delayed(const Duration(milliseconds: 100), () {
             widget.onTap();
-
-            // _controller.animateBack(0);
-
-
           });
           //_controller.reverse();
         },
@@ -83,71 +76,44 @@ class RectangleButton extends StatelessWidget {
   final bool mini;
   final int type;
   final bool inizia;
+  final double width;
 
-  const RectangleButton({
-    Key key,
-    this.text,
-    this.title,
-    this.onTap,
-    this.color = Colors.blue,
-    this.textColor = Colors.white,
-    this.arrow = true,
-    this.mini=false,
-    this.type =1,
-    this.inizia=false
-  }) : super(key: key);
+  const RectangleButton(
+      {Key key,
+      this.text,
+      this.title,
+      this.onTap,
+      this.color = Colors.blue,
+      this.textColor = Colors.white,
+      this.arrow = true,
+      this.mini = false,
+      this.type = 1,
+      this.inizia = false, this.width})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    Color ilcolor=this.color;
+    Color ilcolor = this.color;
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        height: 54,
-        margin: EdgeInsets.only(bottom: 10),
-        child: Stack(
-          alignment: Alignment.center,
-          children: [
-            Positioned(
-              left: 0,
-              right: 0,
-              child: Container(
-                height: 54,
-                child: SvgPicture.asset(!this.mini?'assets/images/Accedi/Coupon_Accedi.svg':
-                this.type==1?'assets/images/Accedi/Accedi_attivo_Log_In.svg':
-                this.type==2?'assets/images/Accedi/Coupon_Accedi_Google.svg':
-                this.type==3?'assets/images/Home/Stop.svg':
-                this.type==4?'assets/images/Home/Inizia_Attivo.svg':
-                this.type==5?'assets/images/Home/Inizia.svg':
-                this.type==6?'assets/images/Accedi/Registrati.svg':'')
-              ),
+        margin: const EdgeInsets.only(bottom: 10),
+        height: 55,
+        width: width == null ? 240: width,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(4),
+          color: color,
+        ),
+        child: Center(
+          child: Text(
+            this.text,
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontFamily: 'Poppins-Regular',
+              color: textColor == null ? Colors.white : textColor,
+              fontSize: 15,
             ),
-            Positioned(
-                left: -230,
-                right: 0,
-                child:
-                    this.type==2?Container(
-                        margin:EdgeInsets.symmetric(horizontal: 5),
-                        child:Image.asset('assets/images/google.png')):Container()
-            ),
-            Positioned(
-              left: 0,
-              right: 0,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                Text(
-                  this.text,
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: this.type==2?Colors.black:Colors.white,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
-                  ),
-                ),
-              ],)
-            ),
-          ],
+          ),
         ),
       ),
     );
@@ -170,8 +136,4 @@ class RectangleButton extends StatelessWidget {
       arrow: arrow,
     );
   }
-
-
 }
-
-

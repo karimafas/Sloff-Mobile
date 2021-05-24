@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="332" height="132" viewBox="0 0 332 132">
+  <defs>
+    <clipPath id="clip-path">
+      <path id="Rettangolo_253" data-name="Rettangolo 253" d="M6,0H326a6,6,0,0,1,6,6V132a0,0,0,0,1,0,0H0a0,0,0,0,1,0,0V6A6,6,0,0,1,6,0Z" transform="translate(22 111)" fill="#190e3b"/>
+    </clipPath>
+    <filter id="Coupon" x="83.834" y="17.334" width="163.332" height="114.245" filterUnits="userSpaceOnUse">
+      <feOffset dy="6" input="SourceAlpha"/>
+      <feGaussianBlur stdDeviation="9" result="blur"/>
+      <feFlood flood-color="#190e3b" flood-opacity="0.161"/>
+      <feComposite operator="in" in2="blur"/>
+      <feComposite in="SourceGraphic"/>
+    </filter>
+  </defs>
+  <g id="Unlock_prize" transform="translate(-22 -111)">
+    <path id="Rettangolo_243" data-name="Rettangolo 243" d="M6,0H326a6,6,0,0,1,6,6V132a0,0,0,0,1,0,0H0a0,0,0,0,1,0,0V6A6,6,0,0,1,6,0Z" transform="translate(22 111)" fill="#190e3b"/>
+    <g id="IMAGE" clip-path="url(#clip-path)">
+      <ellipse id="Ellisse_324" data-name="Ellisse 324" cx="61.5" cy="42.5" rx="61.5" ry="42.5" transform="translate(14.554 188) rotate(16)" fill="#5d5dff"/>
+      <ellipse id="Ellisse_325" data-name="Ellisse 325" cx="47" cy="43.5" rx="47" ry="43.5" transform="translate(287 101)" fill="#44f5cc"/>
+      <rect id="Rettangolo_244" data-name="Rettangolo 244" width="13" height="13" transform="translate(102.168 141.615) rotate(-20)" fill="#fff"/>
+      <rect id="Rettangolo_245" data-name="Rettangolo 245" width="8" height="8" transform="translate(272.133 207.798) rotate(-8)" fill="#fff"/>
+      <rect id="Rettangolo_250" data-name="Rettangolo 250" width="12.459" height="12.459" transform="matrix(0.891, 0.454, -0.454, 0.891, 302.078, 165.66)" fill="#ff6926"/>
+      <rect id="Rettangolo_249" data-name="Rettangolo 249" width="4.621" height="4.621" transform="translate(77.031 172.658) rotate(-20)" fill="#ff6926"/>
+      <rect id="Rettangolo_252" data-name="Rettangolo 252" width="2.283" height="2.283" transform="translate(59.031 204.54) rotate(-20)" fill="#fff"/>
+      <rect id="Rettangolo_246" data-name="Rettangolo 246" width="8" height="8" rx="4" transform="translate(281.168 134.778) rotate(-20)" fill="#fff"/>
+      <rect id="Rettangolo_248" data-name="Rettangolo 248" width="10.329" height="10.329" rx="5.165" transform="translate(97.26 213.76) rotate(-20)" fill="#ff6926"/>
+      <rect id="Rettangolo_247" data-name="Rettangolo 247" width="3" height="3" rx="1.5" transform="translate(48.879 143.681) rotate(-20)" fill="#ff6926"/>
+      <rect id="Rettangolo_251" data-name="Rettangolo 251" width="3" height="3" rx="1.5" transform="translate(324.006 217.873) rotate(-20)" fill="#ff6926"/>
+      <g transform="matrix(1, 0, 0, 1, 22, 111)" filter="url(#Coupon)">
+        <path id="Coupon-2" data-name="Coupon" d="M-2195.666-14706.755H-2297a4,4,0,0,1-4-4v-13.779a12.17,12.17,0,0,0,8.642-3.566,12.077,12.077,0,0,0,3.58-8.611,12.08,12.08,0,0,0-3.58-8.614,12.161,12.161,0,0,0-8.642-3.567V-14763a4,4,0,0,1,4-4h101.334a4,4,0,0,1,4,4v14.109h0a12.155,12.155,0,0,0-8.637,3.566,12.08,12.08,0,0,0-3.581,8.614,12.077,12.077,0,0,0,3.581,8.611,12.165,12.165,0,0,0,8.642,3.566v13.779A4,4,0,0,1-2195.666-14706.755Z" transform="translate(2411.83 14805.33)" fill="#694eff"/>
+      </g>
+    </g>
+  </g>
+</svg>

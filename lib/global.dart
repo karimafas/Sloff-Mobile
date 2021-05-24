@@ -2,9 +2,8 @@ class Global  {
   static String version = '1.0.0';
 
 
-   String getVersion() {
+
+  String getVersion() {
     return version;
   }
-
-
 }
