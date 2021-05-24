@@ -1,4 +1,4 @@
-# Sloff Mobile App
+# Sloff Mobile (iOS & Android)
 
 Sloff is a mental wellbeing app for businesses that aims at reducing hyper-connectivity. Inspired by the pomodoro technique, employees can set a timer and take some time away from their phone while working. Based on how much time they've spent offline, they can then pick between a series of rewards set by their employer.
 
