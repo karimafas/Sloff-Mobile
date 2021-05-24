@@ -10,9 +10,8 @@ Sloff is a mental wellbeing app for businesses that aims at reducing hyper-conne
 ## Preview
 You can access and test the application at: https://www.sloff.app/mobile/
 
-<img src="sloffmobile1.gif" width="250" height="250"/>
+<img src="sloffmobile1.gif" height="40%"/> <img src="sloffmobile2.gif" height="40%"/>
 
-![](sloffmobile1.gif)
 
 ## Credits
 Karim Afas – karimafas@gmail.com
