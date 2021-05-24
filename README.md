@@ -1,16 +1,14 @@
-# sloff_companies
+# Sloff Mobile App
 
-Sloff 
+Sloff is a mental wellbeing app for businesses that aims at reducing hyper-connectivity. Inspired by the pomodoro technique, employees can set a timer and take some time away from their phone while working. Based on how much time they've spent offline, they can then pick between a series of rewards set by their employer.
 
-## Getting Started
+## Built with
+* Flutter 2.0
+* setState State Management
+* Firebase Firestore, Analytics, Functions
 
-This project is a starting point for a Flutter application.
+## Preview
+You can access and test the application at: https://www.sloff.app/mobile/
 
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
-
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## Credits
+Karim Afas – karimafas@gmail.com
