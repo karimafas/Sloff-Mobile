@@ -12,7 +12,7 @@ You can download and test the app at: https://www.sloff.app/mobile/.
 
 Please note that to access the app, users need to be invited by their company. To proceed with testing, firstly make a company account on our Panel as outlined [here](https://github.com/karimafas/Sloff-Panel#readme), then invite your employee with a company email (this can be fake). Once done, use the newly-added company email to create an employee account on the Sloff mobile app and test its features. 
 
-<img src="sloffmobile1.gif" height="400"/>              <img src="sloffmobile2.gif" height="400"/>
+<img src="sloffmobile1.gif" height="420"/>              <img src="sloffmobile2.gif" height="420"/>
 
 ## Credits
 Karim Afas – karimafas@gmail.com
