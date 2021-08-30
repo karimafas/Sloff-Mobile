@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="332" height="132" viewBox="0 0 332 132">
+  <defs>
+    <clipPath id="clip-path">
+      <path id="Rettangolo_253" data-name="Rettangolo 253" d="M6,0H326a6,6,0,0,1,6,6V132a0,0,0,0,1,0,0H0a0,0,0,0,1,0,0V6A6,6,0,0,1,6,0Z" transform="translate(22 111)" fill="#190e3b"/>
+    </clipPath>
+  </defs>
+  <g id="Earth_illustration" transform="translate(-22 -111)">
+    <path id="Rettangolo_243" data-name="Rettangolo 243" d="M6,0H326a6,6,0,0,1,6,6V132a0,0,0,0,1,0,0H0a0,0,0,0,1,0,0V6A6,6,0,0,1,6,0Z" transform="translate(22 111)" fill="#190e3b"/>
+    <g id="IMAGE" clip-path="url(#clip-path)">
+      <path id="bolla" d="M54.715,4.521C70.724,2.906,80.856,7.31,90.727,17.456c9.332,9.592,17.621,20.287,17.621,34.877,0,15.629-5.079,26.387-15.844,36.329-9.467,8.744-16.761,13.705-30.845,13.705-15.213,0-25.361-.243-35.244-10.5C17.185,82.3,9.162,71.745,9.162,57.245c0-14.173,4.236-24.421,13.289-34.132C32.177,12.678,37.084,6.533,54.715,4.521Z" transform="translate(128.746 123.719)" fill="#447af5"/>
+      <rect id="Rettangolo_244" data-name="Rettangolo 244" width="0.951" height="0.951" transform="translate(111.721 144.293) rotate(-20)" fill="#fff"/>
+      <rect id="Rettangolo_293" data-name="Rettangolo 293" width="0.951" height="0.951" transform="translate(151.721 120.293) rotate(-20)" fill="#fff"/>
+      <rect id="Rettangolo_292" data-name="Rettangolo 292" width="0.951" height="0.951" transform="translate(59.195 123.925) rotate(59)" fill="#fff"/>
+      <rect id="Rettangolo_245" data-name="Rettangolo 245" width="2" height="2" transform="translate(270.166 199.762) rotate(-8)" fill="#fff"/>
+      <rect id="Rettangolo_291" data-name="Rettangolo 291" width="1" height="1" transform="translate(242.166 131.762) rotate(-8)" fill="#fff"/>
+      <rect id="Rettangolo_250" data-name="Rettangolo 250" width="2.813" height="2.813" transform="matrix(0.891, 0.454, -0.454, 0.891, 278.186, 165.185)" fill="#fff"/>
+      <rect id="Rettangolo_249" data-name="Rettangolo 249" width="4.621" height="4.621" transform="matrix(0.891, 0.454, -0.454, 0.891, 97.983, 188.195)" fill="#fff"/>
+      <rect id="Rettangolo_252" data-name="Rettangolo 252" width="2.283" height="2.283" transform="translate(59.031 204.54) rotate(-20)" fill="#fff"/>
+      <rect id="Rettangolo_246" data-name="Rettangolo 246" width="4" height="4" rx="2" transform="translate(283.731 135.974) rotate(-20)" fill="#fff"/>
+      <rect id="Rettangolo_248" data-name="Rettangolo 248" width="4.693" height="4.693" rx="2.347" transform="translate(55.942 168.682) rotate(-20)" fill="#fff"/>
+      <rect id="Rettangolo_286" data-name="Rettangolo 286" width="2.245" height="2.245" rx="1.122" transform="translate(78.456 228.423) rotate(-20)" fill="#fff"/>
+      <rect id="Rettangolo_295" data-name="Rettangolo 295" width="1.245" height="1.245" rx="0.622" transform="translate(36.456 212.423) rotate(-20)" fill="#fff"/>
+      <rect id="Rettangolo_247" data-name="Rettangolo 247" width="3" height="3" rx="1.5" transform="translate(48.879 143.681) rotate(-20)" fill="#fff"/>
+      <rect id="Rettangolo_251" data-name="Rettangolo 251" width="3" height="3" rx="1.5" transform="translate(324.006 217.873) rotate(-20)" fill="#fff"/>
+      <rect id="Rettangolo_287" data-name="Rettangolo 287" width="1" height="1" rx="0.5" transform="translate(335.69 151.752) rotate(-20)" fill="#fff"/>
+      <rect id="Rettangolo_290" data-name="Rettangolo 290" width="1" height="1" rx="0.5" transform="translate(239.69 228.752) rotate(-20)" fill="#fff"/>
+      <rect id="Rettangolo_294" data-name="Rettangolo 294" width="1" height="1" rx="0.5" transform="translate(124.69 203.752) rotate(-20)" fill="#fff"/>
+      <rect id="Rettangolo_289" data-name="Rettangolo 289" width="1" height="1" rx="0.5" transform="translate(301.051 194.752) rotate(-20)" fill="#fff"/>
+      <rect id="Rettangolo_288" data-name="Rettangolo 288" width="1" height="1" rx="0.5" transform="translate(322.689 128.752) rotate(-20)" fill="#fff"/>
+      <circle id="Ellisse_335" data-name="Ellisse 335" cx="46" cy="46" r="46" transform="translate(297 179)" fill="#ff6926"/>
+      <path id="Tracciato_830" data-name="Tracciato 830" d="M-19539.076-9674.99c-9.725-10.913-4.441-2.539-13.834-1.92s-12.432,8.719-16.617,9.777-.283,4.091-1.627,8.734-7.963,6.335-3.457,9.694,6.059-3.549,6.754-6.314,4.746-4,6.209,0,7.439,2.6,5.74-4.884,13.389,1.751,8.125,7.868-8.531,11.684-16.941,10.936-14.594-4.923-17.348,0-6.365,9.678-2.246,16.627,8.926,5.052,14.791,4.338,6.959,1.971,7.879,5.629,1.732,12.96,2.83,14.637a3.632,3.632,0,0,0,2.91,1.643,60.547,60.547,0,0,0,16.756-12.819c6.979-8.024,12.27-15.943,13.121-30.054S-19529.352-9664.077-19539.076-9674.99Z" transform="translate(19763 9821)" fill="#a8e35a"/>
+      <path id="Tracciato_831" data-name="Tracciato 831" d="M-19620.312-9662.156c3.029-5.842-1.781,13.662.5,18.77s5.455,5.66,4.7,9.445-2.941,14.051,0,20.194c-2.148-1.661-9.078-12.089-9.9-23A47.441,47.441,0,0,1-19620.312-9662.156Z" transform="translate(19763 9821)" fill="#a8e35a"/>
+      <path id="Tracciato_832" data-name="Tracciato 832" d="M-19604.406-9681.921s4.318,1.814,11.162-2.1a67.306,67.306,0,0,0,11.609-8.433,46.462,46.462,0,0,0-12.7,3.429A37.844,37.844,0,0,0-19604.406-9681.921Z" transform="translate(19763 9821)" fill="#d3f2ff"/>
+    </g>
+  </g>
+</svg>

@@ -1,0 +1,71 @@
+{
+  "project_info": {
+    "project_number": "821054410595",
+    "firebase_url": "https://sloff-1c2f2.firebaseio.com",
+    "project_id": "sloff-1c2f2",
+    "storage_bucket": "sloff-1c2f2.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:821054410595:android:26b7c88828f207747a8d56",
+        "android_client_info": {
+          "package_name": "com.sloff"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "821054410595-8b6md5d7gsb5m2fgov24pml7sdf9mcff.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.sloff",
+            "certificate_hash": "0c85e4b1ff453c1d5772b7402c11e9b63336b576"
+          }
+        },
+        {
+          "client_id": "821054410595-gr5mlc9mvrddqu57i752bq7a7c77mdkj.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.sloff",
+            "certificate_hash": "23fe11b4997318e97f0fad3cf147391d93c65e7e"
+          }
+        },
+        {
+          "client_id": "821054410595-iii1a4vev44d70gu8qe8jvin0mn23sv3.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.sloff",
+            "certificate_hash": "2ab2973656d4e3baffe34ed32003db704ed43427"
+          }
+        },
+        {
+          "client_id": "821054410595-b4jp1ri85lf7qtsj4p3psaalitgohlov.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyABTfr6xt6zXXerOj2x1D_RBVsfyfV_Ckg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "821054410595-b4jp1ri85lf7qtsj4p3psaalitgohlov.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "821054410595-vh2md2f8igukn176asqiokh09o0624lq.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.sloff"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
