@@ -273,8 +273,6 @@ class SloffMethods {
         .get();
     var users = usersList.docs;
 
-    print("USERSSSS $users");
-
     final query = await FirebaseFirestore.instance
         .collection("users_company")
         .doc(company)

@@ -3,6 +3,7 @@ import 'dart:io';
 import 'dart:ui';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
@@ -84,14 +85,14 @@ class _HomePageState extends State<HomePage> {
             }));
       }
 
-      var currentUser = await SloffApi.getFocus(widget.uuid);
+      var currentUser = await SloffApi.getFocus(widget.uuid, token);
 
       if (currentUser == "NULL") {
         await SloffApi.createFocus(widget.uuid, 0, token);
       }
     });
 
-    var currentUser = await SloffApi.getFocus(widget.uuid);
+    var currentUser = await SloffApi.getFocus(widget.uuid, token);
 
     if (currentUser == "NULL") {
       await SloffApi.createFocus(widget.uuid, 0, token);
@@ -101,10 +102,47 @@ class _HomePageState extends State<HomePage> {
         await SloffApi.getCompanyGroupFocus(companyID: widget.company); */
 
     await Provider.of<TimerNotifier>(context, listen: false).getGroupFocus();
-    await Provider.of<TimerNotifier>(context, listen: false).getIndividualFocus();
+    await Provider.of<TimerNotifier>(context, listen: false)
+        .getIndividualFocus(token);
 
     /* await Provider.of<TimerNotifier>(context, listen: false)
         .getGroupRequiredMinutes(); */
+
+    var groupChallenge =
+        await SloffMethods.isThereGroupChallenge(widget.company);
+
+    if (groupChallenge) {
+      var challenge = await FirebaseFirestore.instance
+          .collection('users_company')
+          .doc(widget.company)
+          .collection('challenge')
+          .where("visible", isEqualTo: true)
+          .get();
+
+      var usersFocusAdded = challenge.docs[0]['usersFocusAdded'];
+
+      if (!usersFocusAdded.contains(widget.uuid)) {
+        FirebaseFirestore.instance
+            .collection('users_company')
+            .doc(widget.company)
+            .collection('challenge')
+            .doc(challenge.docs[0].reference.id)
+            .set({
+          "groupFocusMinutes": FieldValue.increment(
+              Provider.of<TimerNotifier>(context, listen: false)
+                  .individualFocusMinutes)
+        }, SetOptions(merge: true)).then((value) {
+          FirebaseFirestore.instance
+              .collection('users_company')
+              .doc(widget.company)
+              .collection('challenge')
+              .doc(challenge.docs[0].reference.id)
+              .set({
+            "usersFocusAdded": FieldValue.arrayUnion([widget.uuid])
+          }, SetOptions(merge: true));
+        });
+      }
+    }
 
     return true;
   }
@@ -297,101 +335,184 @@ class _HomePageState extends State<HomePage> {
                           })  */ /* ;
                     }), */
 
-                      Stack(
-                    children: [
-                      Container(
-                        width: MediaQuery.of(context).size.width,
-                        color: new Color(0xFFFFF8ED),
-                        child: SlideYFadeIn(
-                          3,
-                          Stack(
-                            alignment: Alignment.center,
-                            children: [
-                              Container(color: new Color(0xFFFFF8ED)),
-                              Background(),
-                              BackdropFilter(
-                                filter:
-                                    ImageFilter.blur(sigmaX: 70, sigmaY: 70),
-                                child: Container(
-                                  child: Scaffold(
-                                      resizeToAvoidBottomInset: true,
-                                      backgroundColor: Colors.transparent,
-                                      bottomNavigationBar: BottomNavigationBar(
-                                        elevation: 0,
-                                        selectedItemColor:
-                                            new Color(0xFFFF6926),
-                                        selectedFontSize: 12,
-                                        backgroundColor: Colors.transparent,
-                                        onTap: (int index) =>
-                                            onBottomNavigationTap(
-                                                context, index),
-                                        currentIndex: _currentIndex,
-                                        items: <BottomNavigationBarItem>[
-                                          BottomNavigationBarItem(
-                                              icon: _currentIndex == 0
-                                                  ? new SvgPicture.asset(
-                                                      'assets/images/Tab_Bar/Home_icon_ON.svg')
-                                                  : SvgPicture.asset(
-                                                      'assets/images/Tab_Bar/Home_icon.svg'),
-                                              label: 'Home'),
-                                          BottomNavigationBarItem(
-                                            icon: _currentIndex == 1
-                                                ? new SvgPicture.asset(
-                                                    'assets/images/Tab_Bar/Reward_icon_ON.svg')
-                                                : SvgPicture.asset(
-                                                    'assets/images/Tab_Bar/Reward_icon.svg'),
-                                            label: 'Reward',
-                                          ),
-                                          BottomNavigationBarItem(
-                                            icon: _currentIndex == 2
-                                                ? SvgPicture.asset(
-                                                    'assets/images/Tab_Bar/Profile_icon_ON.svg')
-                                                : SvgPicture.asset(
-                                                    'assets/images/Tab_Bar/Profile_icon.svg'),
-                                            label: 'Profile',
+                      StreamBuilder<QuerySnapshot>(
+                          stream: FirebaseFirestore.instance
+                              .collection("users_company")
+                              .doc(widget.company)
+                              .collection("challenge")
+                              .where("visible", isEqualTo: true)
+                              .snapshots(),
+                          builder: (context, snapshot) {
+                            if (!snapshot.hasData) {
+                              return Container();
+                            } else if (snapshot.hasError) {
+                              return Container();
+                            } else {
+                              if (snapshot.data.size > 0 &&
+                                  snapshot.data.docs[0]['group']) {
+                                if (snapshot.data.docs[0]
+                                        ['groupFocusMinutes'] >=
+                                    snapshot.data.docs[0]['total_focus'] * 60) {
+                                  if (!snapshot.data.docs[0]['written']) {
+                                    FirebaseFirestore.instance
+                                        .collection("users_company")
+                                        .doc(widget.company)
+                                        .collection("challenge")
+                                        .doc(snapshot.data.docs[0].reference.id)
+                                        .update({"written": true}).then(
+                                            (value) =>
+                                                SloffMethods.writeGroupReward(
+                                                    snapshot.data.docs[0],
+                                                    widget.company,
+                                                    widget.uuid));
+
+                                    Provider.of<TimerNotifier>(context,
+                                            listen: false)
+                                        .getIndividualFocus(token);
+                                  }
+
+                                  if (!snapshot.data.docs[0]['usersWarned']
+                                      .contains(widget.uuid)) {
+                                    FirebaseFirestore.instance
+                                        .collection("users_company")
+                                        .doc(widget.company)
+                                        .collection("challenge")
+                                        .doc(snapshot.data.docs[0].reference.id)
+                                        .set({
+                                      "usersWarned":
+                                          FieldValue.arrayUnion([widget.uuid])
+                                    }, SetOptions(merge: true)).then((value) {
+                                      SloffModals.unlockGroupReward(context,
+                                          (goToProfile) {
+                                        FirebaseFirestore.instance
+                                            .collection("users")
+                                            .doc(widget.uuid)
+                                            .update({"popupShown": true}).then(
+                                                (value) => goToProfile
+                                                    ? navigateToProfile()
+                                                    : () {});
+                                      });
+                                    });
+                                  }
+                                }
+                              }
+
+                              return Stack(
+                                children: [
+                                  Container(
+                                    width: MediaQuery.of(context).size.width,
+                                    color: new Color(0xFFFFF8ED),
+                                    child: SlideYFadeIn(
+                                      3,
+                                      Stack(
+                                        alignment: Alignment.center,
+                                        children: [
+                                          Container(
+                                              color: new Color(0xFFFFF8ED)),
+                                          Background(),
+                                          BackdropFilter(
+                                            filter: ImageFilter.blur(
+                                                sigmaX: 70, sigmaY: 70),
+                                            child: Container(
+                                              child: Scaffold(
+                                                  resizeToAvoidBottomInset:
+                                                      true,
+                                                  backgroundColor:
+                                                      Colors.transparent,
+                                                  bottomNavigationBar:
+                                                      BottomNavigationBar(
+                                                    elevation: 0,
+                                                    selectedItemColor:
+                                                        new Color(0xFFFF6926),
+                                                    selectedFontSize: 12,
+                                                    backgroundColor:
+                                                        Colors.transparent,
+                                                    onTap: (int index) =>
+                                                        onBottomNavigationTap(
+                                                            context, index),
+                                                    currentIndex: _currentIndex,
+                                                    items: <
+                                                        BottomNavigationBarItem>[
+                                                      BottomNavigationBarItem(
+                                                          icon: _currentIndex ==
+                                                                  0
+                                                              ? new SvgPicture
+                                                                      .asset(
+                                                                  'assets/images/Tab_Bar/Home_icon_ON.svg')
+                                                              : SvgPicture.asset(
+                                                                  'assets/images/Tab_Bar/Home_icon.svg'),
+                                                          label: 'Home'),
+                                                      BottomNavigationBarItem(
+                                                        icon: _currentIndex == 1
+                                                            ? new SvgPicture
+                                                                    .asset(
+                                                                'assets/images/Tab_Bar/Reward_icon_ON.svg')
+                                                            : SvgPicture.asset(
+                                                                'assets/images/Tab_Bar/Reward_icon.svg'),
+                                                        label: 'Reward',
+                                                      ),
+                                                      BottomNavigationBarItem(
+                                                        icon: _currentIndex == 2
+                                                            ? SvgPicture.asset(
+                                                                'assets/images/Tab_Bar/Profile_icon_ON.svg')
+                                                            : SvgPicture.asset(
+                                                                'assets/images/Tab_Bar/Profile_icon.svg'),
+                                                        label: 'Profile',
+                                                      ),
+                                                    ],
+                                                  ),
+                                                  body: SafeArea(
+                                                    child: Padding(
+                                                      padding:
+                                                          const EdgeInsets.only(
+                                                              top: 10),
+                                                      child: IndexedStack(
+                                                        index: _currentIndex,
+                                                        children: <Widget>[
+                                                          SloffTimer(
+                                                              goToRewards:
+                                                                  goToRewards,
+                                                              uuid: widget.uuid,
+                                                              company: widget
+                                                                  .company),
+                                                          Challenge(
+                                                              goToProfile:
+                                                                  goToProfile,
+                                                              uuid: widget.uuid,
+                                                              company: widget
+                                                                  .company,
+                                                              groupFocusMinutes:
+                                                                  data.groupFocusMinutes),
+                                                          UserProfile(
+                                                              key: firstProfileTap
+                                                                  ? UniqueKey()
+                                                                  : null,
+                                                              uuid: widget.uuid,
+                                                              company: widget
+                                                                  .company),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  )),
+                                            ),
                                           ),
                                         ],
                                       ),
-                                      body: SafeArea(
-                                        child: Padding(
-                                          padding:
-                                              const EdgeInsets.only(top: 10),
-                                          child: IndexedStack(
-                                            index: _currentIndex,
-                                            children: <Widget>[
-                                              SloffTimer(
-                                                  goToRewards: goToRewards,
-                                                  uuid: widget.uuid,
-                                                  company: widget.company),
-                                              Challenge(
-                                                  goToProfile: goToProfile,
-                                                  uuid: widget.uuid,
-                                                  company: widget.company,
-                                                  groupFocusMinutes:
-                                                      data.groupFocusMinutes),
-                                              UserProfile(
-                                                  key: firstProfileTap
-                                                      ? UniqueKey()
-                                                      : null,
-                                                  uuid: widget.uuid,
-                                                  company: widget.company),
-                                            ],
-                                          ),
-                                        ),
-                                      )),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                      AnimatedOpacity(
-                          opacity: data.groupChallengeCompletePopup ? 1 : 0,
-                          duration: Duration(milliseconds: 500),
-                          child: Container(
-                              height: 100, width: 100, color: Colors.red)),
-                    ],
-                  ));
+                                    ),
+                                  ),
+                                  AnimatedOpacity(
+                                      opacity: data.groupChallengeCompletePopup
+                                          ? 1
+                                          : 0,
+                                      duration: Duration(milliseconds: 500),
+                                      child: Container(
+                                          height: 100,
+                                          width: 100,
+                                          color: Colors.red)),
+                                ],
+                              );
+                            }
+                          }));
             });
           }
         });

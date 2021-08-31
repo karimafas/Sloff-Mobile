@@ -16,7 +16,8 @@ class FocusSuccess extends StatefulWidget {
       this.uuid,
       this.minutes,
       this.initialRanking,
-      this.finalRanking})
+      this.finalRanking,
+      this.name})
       : super(key: key);
 
   final String company;
@@ -24,6 +25,7 @@ class FocusSuccess extends StatefulWidget {
   final int minutes;
   final int initialRanking;
   final int finalRanking;
+  final String name;
 
   @override
   _FocusSuccessState createState() => _FocusSuccessState();
@@ -32,7 +34,6 @@ class FocusSuccess extends StatefulWidget {
 class _FocusSuccessState extends State<FocusSuccess> {
   Future initialise;
   var challengeDetails = new Map();
-  String name;
   bool challengeExists = false;
 
   Future<bool> initialisation() async {
@@ -112,7 +113,7 @@ class _FocusSuccessState extends State<FocusSuccess> {
                           children: [
                             Text(
                                 "focus-success-1"
-                                    .tr(namedArgs: {"name": "name"}),
+                                    .tr(namedArgs: {"name": widget.name.capitalize()}),
                                 style: TextStyle(
                                     color: new Color(0xFF190E3B),
                                     fontFamily: 'Poppins-Regular',

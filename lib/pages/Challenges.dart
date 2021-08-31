@@ -220,71 +220,49 @@ class _Challenge extends State<Challenge> with SingleTickerProviderStateMixin {
                                 } else {
                                   return StreamBuilder(
                                       stream: FirebaseFirestore.instance
-                                          .collection("users_company")
+                                          .collection('users_company')
                                           .doc(widget.company)
-                                          .collection("users")
+                                          .collection('challenge')
+                                          .doc(snapshot.data.docs[0].id)
+                                          .collection('coupon')
                                           .snapshots(),
-                                      builder: (context, challengesSnapshot) {
-                                        return StreamBuilder(
-                                            stream: FirebaseFirestore.instance
-                                                .collection('users_company')
-                                                .doc(widget.company)
-                                                .collection('challenge')
-                                                .doc(snapshot.data.docs[0].id)
-                                                .collection('coupon')
-                                                .snapshots(),
-                                            builder:
-                                                (context, rewardsSnapshot) {
-                                              if (!rewardsSnapshot.hasData) {
-                                                return Container();
-                                              } else if (rewardsSnapshot
-                                                  .hasError) {
-                                                return Container();
-                                              } else {
-                                                return Column(
-                                                  children: [
-                                                    StatusBarGroup(
-                                                        challengeTitle:
-                                                            challengeTitle,
-                                                        challengeStart:
-                                                            challengeStart,
-                                                        challengeEnd:
-                                                            challengeEnd),
-                                                    ListView.builder(
-                                                      shrinkWrap: true,
-                                                      scrollDirection:
-                                                          Axis.vertical,
-                                                      itemBuilder: (context,
-                                                              index) =>
-                                                          index <
-                                                                  rewardsSnapshot
-                                                                      .data
-                                                                      .docs
-                                                                      .length
-                                                              ? rewardBuilder(
-                                                                  true,
-                                                                  context,
-                                                                  rewardsSnapshot
-                                                                          .data
-                                                                          .docs[
-                                                                      index],
-                                                                  widget
-                                                                      .groupFocusMinutes,
-                                                                  snapshot
-                                                                      .data
-                                                                      .docs[0]
-                                                                      .id)
-                                                              : ListFooterGroup(),
-                                                      itemCount: rewardsSnapshot
-                                                              .data
-                                                              .docs
-                                                              .length +
-                                                          1,
-                                                    ),
-                                                  ],
-                                                );
-                                              }
-                                            });
+                                      builder: (context, rewardsSnapshot) {
+                                        if (!rewardsSnapshot.hasData) {
+                                          return Container();
+                                        } else if (rewardsSnapshot.hasError) {
+                                          return Container();
+                                        } else {
+                                          return Column(
+                                            children: [
+                                              StatusBarGroup(
+                                                  challengeTitle:
+                                                      challengeTitle,
+                                                  challengeStart:
+                                                      challengeStart,
+                                                  challengeEnd: challengeEnd),
+                                              ListView.builder(
+                                                shrinkWrap: true,
+                                                scrollDirection: Axis.vertical,
+                                                itemBuilder: (context, index) =>
+                                                    index <
+                                                            rewardsSnapshot.data
+                                                                .docs.length
+                                                        ? rewardBuilder(
+                                                            true,
+                                                            context,
+                                                            rewardsSnapshot.data
+                                                                .docs[index],
+                                                            snapshot.data.docs[0]['groupFocusMinutes'],
+                                                            snapshot.data
+                                                                .docs[0].id)
+                                                        : ListFooterGroup(),
+                                                itemCount: rewardsSnapshot
+                                                        .data.docs.length +
+                                                    1,
+                                              ),
+                                            ],
+                                          );
+                                        }
                                       });
                                 }
                               }

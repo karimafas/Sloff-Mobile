@@ -15,6 +15,7 @@ import 'package:is_lock_screen/is_lock_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:rive/rive.dart';
 import 'package:sloff/components/FadeNavigation.dart';
+import 'package:sloff/components/SloffMethods.dart';
 import 'package:sloff/components/SloffModals.dart';
 import 'package:sloff/components/SloffNotifications.dart';
 import 'package:sloff/components/TimerInfoPage.dart';
@@ -26,8 +27,7 @@ import 'package:sloff/services/alarmManager.dart';
 import 'package:sloff/services/provider/TimerNotifier.dart';
 
 class SloffTimer extends StatefulWidget {
-  SloffTimer(
-      {Key key, this.goToRewards, this.uuid, this.company})
+  SloffTimer({Key key, this.goToRewards, this.uuid, this.company})
       : super(key: key);
 
   @override
@@ -196,7 +196,7 @@ class _SloffTimerState extends State<SloffTimer> with WidgetsBindingObserver {
       }
 
       if (secondsToEnd == 0) {
-        await writeDb(minutesToWrite);
+        writeDb(minutesToWrite);
         stop(false, true);
         prefs.setBool("timeRecorded", true);
       }
@@ -251,12 +251,12 @@ class _SloffTimerState extends State<SloffTimer> with WidgetsBindingObserver {
             pushWithFade(
                 context,
                 FocusSuccess(
-                  company: widget.company,
-                  uuid: widget.uuid,
-                  minutes: minutesToWrite,
-                  initialRanking: int.parse(initialRanking),
-                  finalRanking: int.parse(finalRanking),
-                ),
+                    company: widget.company,
+                    uuid: widget.uuid,
+                    minutes: minutesToWrite,
+                    initialRanking: int.parse(initialRanking),
+                    finalRanking: int.parse(finalRanking),
+                    name: name),
                 500);
             /* SloffModals.focusCompleted(context, minutesToWrite, name,
                 widget.goToRewards, widget.company); */
@@ -367,11 +367,35 @@ class _SloffTimerState extends State<SloffTimer> with WidgetsBindingObserver {
     // Add or update user chart data, fetched through the API
     await SloffApi.increaseFocus(uuid, minutes, token);
 
-    //focus = jsonDecode(await SloffApi.getAllFocus(token));
-
     finalRanking = await SloffApi.findRanking(uuid: uuid, token: token);
 
     await Provider.of<TimerNotifier>(context, listen: false).getGroupFocus();
+    await Provider.of<TimerNotifier>(context, listen: false)
+        .getIndividualFocus(token);
+    Provider.of<TimerNotifier>(context, listen: false)
+        .setRanking(int.parse(initialRanking), int.parse(finalRanking));
+
+    // If there is a group challenge, update the document containing group focus
+    var groupChallenge =
+        await SloffMethods.isThereGroupChallenge(widget.company);
+
+    if (groupChallenge) {
+      var challenge = await FirebaseFirestore.instance
+          .collection('users_company')
+          .doc(widget.company)
+          .collection('challenge')
+          .where("visible", isEqualTo: true)
+          .get();
+
+        FirebaseFirestore.instance
+            .collection('users_company')
+            .doc(widget.company)
+            .collection('challenge')
+            .doc(challenge.docs[0].reference.id)
+            .set({
+          "groupFocusMinutes": FieldValue.increment(minutes)
+        }, SetOptions(merge: true));
+    }
   }
 
   @override

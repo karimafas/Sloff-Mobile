@@ -20,9 +20,7 @@ class SloffApi {
     }
   }
 
-  static Future getFocus(String uuid) async {
-    var token = await FirebaseAuth.instance.currentUser.getIdToken();
-
+  static Future getFocus(String uuid, String token) async {
     final response = await http.get(
         Uri.parse(baseUrl + '/focus/search/' + uuid),
         headers: {"Authorization": "Bearer " + token});
@@ -50,7 +48,7 @@ class SloffApi {
   }
 
   static Future increaseFocus(String uuid, int minutes, String token) async {
-    var user = await getFocus(uuid);
+    var user = await getFocus(uuid, token);
     int currentMinutes = jsonDecode(user)['available'];
 
     return http.put(
@@ -67,7 +65,7 @@ class SloffApi {
   }
 
   static Future subtractFocus(String uuid, int minutes, String token) async {
-    var user = await getFocus(uuid);
+    var user = await getFocus(uuid, token);
     int currentMinutes = jsonDecode(user)['available'];
 
     return http.put(

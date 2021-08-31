@@ -125,9 +125,7 @@ class _MyApp extends State<MyApp> {
             return Container();
           }
           if (snapshot.connectionState == ConnectionState.done) {
-            FirebaseAuth.instance.signInAnonymously().then((value) {
-              print("signed in anonymously");
-            });
+            FirebaseAuth.instance.signInAnonymously();
 
             return MaterialApp(
               title: 'Sloff',
