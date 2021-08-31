@@ -4,13 +4,16 @@ import 'package:dots_indicator/dots_indicator.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
 import 'package:rive/rive.dart';
 import 'package:sloff/components/Animations.dart';
 import 'package:sloff/components/Background.dart';
+import 'package:sloff/components/FadeNavigation.dart';
 import 'package:sloff/components/OnboardingBackground.dart';
 import 'package:sloff/components/RectangleButton.dart';
 import 'package:sloff/pages/HomePage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:sloff/services/provider/TimerNotifier.dart';
 import 'ChangeSocialCause.dart';
 
 class Onboarding extends StatefulWidget {
@@ -424,13 +427,17 @@ class _OnboardingReadyState extends State<OnboardingReady> {
                             onTap: () async {
                               SharedPreferences prefs =
                                   await SharedPreferences.getInstance();
-                              Navigator.pushReplacement(
+                              pushWithFade(
                                   context,
-                                  MaterialPageRoute(
-                                      builder: (context) => HomePage(
-                                          uuid: prefs.getString("uuid"),
-                                          company:
-                                              prefs.getString("company"))));
+                                  ChangeNotifierProvider(
+                                    create: (_) => TimerNotifier(
+                                        prefs.getString("company"),
+                                        prefs.getString("uuid")),
+                                    child: HomePage(
+                                        uuid: prefs.getString("uuid"),
+                                        company: prefs.getString("company")),
+                                  ),
+                                  500);
                             },
                             text: "explore".tr().toUpperCase(),
                             color: new Color(0xFFFF6926),

@@ -177,46 +177,43 @@ class _SplashScreenState extends State<SplashScreen> {
             context,
             widget.uuid == null
                 ? PreLogin()
-                : ChangeNotifierProvider(
-                  create: (_) => TimerNotifier(widget.company, widget.uuid),
-                  child: FutureBuilder(
-                      future: checkSurvey,
-                      builder: (context, snapshot) {
-                        if (!snapshot.hasData) {
+                : FutureBuilder(
+                    future: checkSurvey,
+                    builder: (context, snapshot) {
+                      if (!snapshot.hasData) {
+                        return HomePage(
+                            uuid: widget.uuid, company: widget.company);
+                      }
+                      if (snapshot.hasError) {
+                        return Container(color: Colors.red);
+                      } else {
+                        if (snapshot.data != null) {
+                          if (dailySurvey) {
+                            return EmojiSurvey(
+                              uuid: widget.uuid,
+                              company: widget.company,
+                              name: name,
+                              surveyId: snapshot.data,
+                            );
+                          } else {
+                            return sloffSurvey == false
+                                ? RegularSurvey(
+                                    uuid: widget.uuid,
+                                    company: widget.company,
+                                    surveyId: snapshot.data,
+                                    name: name)
+                                : SloffTeamSurvey(
+                                    uuid: widget.uuid,
+                                    company: widget.company,
+                                    surveyId: snapshot.data,
+                                    name: name);
+                          }
+                        } else {
                           return HomePage(
                               uuid: widget.uuid, company: widget.company);
                         }
-                        if (snapshot.hasError) {
-                          return Container(color: Colors.red);
-                        } else {
-                          if (snapshot.data != null) {
-                            if (dailySurvey) {
-                              return EmojiSurvey(
-                                uuid: widget.uuid,
-                                company: widget.company,
-                                name: name,
-                                surveyId: snapshot.data,
-                              );
-                            } else {
-                              return sloffSurvey == false
-                                  ? RegularSurvey(
-                                      uuid: widget.uuid,
-                                      company: widget.company,
-                                      surveyId: snapshot.data,
-                                      name: name)
-                                  : SloffTeamSurvey(
-                                      uuid: widget.uuid,
-                                      company: widget.company,
-                                      surveyId: snapshot.data,
-                                      name: name);
-                            }
-                          } else {
-                            return HomePage(
-                                uuid: widget.uuid, company: widget.company);
-                          }
-                        }
-                      }),
-                ),
+                      }
+                    }),
             800);
       });
     });

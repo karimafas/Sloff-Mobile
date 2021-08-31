@@ -49,6 +49,8 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<bool> initialise() async {
+
+
     token = await FirebaseAuth.instance.currentUser.getIdToken();
 
     SloffApi.checkIfUserExists(uuid: widget.uuid, token: token)
