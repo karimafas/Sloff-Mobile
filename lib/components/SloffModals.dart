@@ -206,7 +206,8 @@ class SloffModals {
                     padding: const EdgeInsets.symmetric(horizontal: 20),
                     child: Text(
                         "reward-cost".tr(namedArgs: {
-                          "hours-spent": (document['total_focus'] * 60).toString(),
+                          "hours-spent":
+                              (document['total_focus'] * 60).toString(),
                           "hours-left":
                               (usertime - (document['total_focus'] * 60))
                                   .round()

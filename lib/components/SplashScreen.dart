@@ -4,6 +4,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:provider/provider.dart';
 import 'package:sloff/components/Animations.dart';
 import 'package:sloff/components/FadeNavigation.dart';
 import 'package:sloff/pages/FocusSuccess.dart';
@@ -12,6 +13,7 @@ import 'package:sloff/pages/EmojiSurvey.dart';
 import 'package:sloff/pages/RegularSurvey.dart';
 import 'package:sloff/pages/SloffTeamSurvey.dart';
 import 'package:sloff/pages/PreLogin.dart';
+import 'package:sloff/services/provider/TimerNotifier.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({
@@ -175,44 +177,46 @@ class _SplashScreenState extends State<SplashScreen> {
             context,
             widget.uuid == null
                 ? PreLogin()
-                : FutureBuilder(
-                    future: checkSurvey,
-                    builder: (context, snapshot) {
-                      if (!snapshot.hasData) {
-                        return HomePage(
-                            uuid: widget.uuid,
-                            company: widget.company);
-                      }
-                      if (snapshot.hasError) {
-                        return Container(color: Colors.red);
-                      } else {
-                        if (snapshot.data != null) {
-                          if (dailySurvey) {
-                            return EmojiSurvey(
-                              uuid: widget.uuid,
-                              company: widget.company,
-                              name: name,
-                              surveyId: snapshot.data,
-                            );
-                          } else {
-                            return sloffSurvey == false
-                                ? RegularSurvey(
-                                    uuid: widget.uuid,
-                                    company: widget.company,
-                                    surveyId: snapshot.data,
-                                    name: name)
-                                : SloffTeamSurvey(
-                                    uuid: widget.uuid,
-                                    company: widget.company,
-                                    surveyId: snapshot.data,
-                                    name: name);
-                          }
-                        } else {
+                : ChangeNotifierProvider(
+                  create: (_) => TimerNotifier(widget.company, widget.uuid),
+                  child: FutureBuilder(
+                      future: checkSurvey,
+                      builder: (context, snapshot) {
+                        if (!snapshot.hasData) {
                           return HomePage(
                               uuid: widget.uuid, company: widget.company);
                         }
-                      }
-                    }),
+                        if (snapshot.hasError) {
+                          return Container(color: Colors.red);
+                        } else {
+                          if (snapshot.data != null) {
+                            if (dailySurvey) {
+                              return EmojiSurvey(
+                                uuid: widget.uuid,
+                                company: widget.company,
+                                name: name,
+                                surveyId: snapshot.data,
+                              );
+                            } else {
+                              return sloffSurvey == false
+                                  ? RegularSurvey(
+                                      uuid: widget.uuid,
+                                      company: widget.company,
+                                      surveyId: snapshot.data,
+                                      name: name)
+                                  : SloffTeamSurvey(
+                                      uuid: widget.uuid,
+                                      company: widget.company,
+                                      surveyId: snapshot.data,
+                                      name: name);
+                            }
+                          } else {
+                            return HomePage(
+                                uuid: widget.uuid, company: widget.company);
+                          }
+                        }
+                      }),
+                ),
             800);
       });
     });

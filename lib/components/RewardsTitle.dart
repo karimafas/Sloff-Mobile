@@ -1,7 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:provider/provider.dart';
 import 'package:sloff/pages/Challenges.dart';
+import 'package:sloff/services/provider/TimerNotifier.dart';
 
 class RewardsTitle extends StatelessWidget {
   const RewardsTitle({
@@ -51,36 +53,17 @@ class RewardsTitle extends StatelessWidget {
                                     width: 56,
                                     child: SvgPicture.asset(
                                         "assets/images/Coupon/focus.svg")),
-                                StreamBuilder(
-                                  stream: FirebaseFirestore.instance
-                                      .collection("focus")
-                                      .doc(widget.uuid)
-                                      .snapshots(),
-                                  builder: (context, snapshot) {
-                                    if (!snapshot.hasData) {
-                                      return Container();
-                                    } else if (snapshot.hasError) {
-                                      return Container();
-                                    } else {
-                                      int userMinutes =
-                                          snapshot.data["available"];
-
-                                      int userHours =
-                                          (snapshot.data["available"] / 60)
-                                              .round();
-
-                                      
+                                Consumer<TimerNotifier>(
+                                    builder: (context, data, index) {
                                       return Text(
                                           !hours
-                                              ? userMinutes.toString() + " min"
-                                              : userHours.toString() + " h",
+                                              ? data.individualFocusMinutes.toString() + " min"
+                                              : (data.individualFocusMinutes / 60).round().toString() + " h",
                                           style: TextStyle(
                                               color: Colors.white,
                                               fontSize: 12,
                                               fontWeight: FontWeight.bold));
-                                    }
-                                  },
-                                ),
+                                    })
                               ],
                             ),
                           ),

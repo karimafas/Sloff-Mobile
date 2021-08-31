@@ -77,7 +77,7 @@ class _ChartsState extends State<Charts> {
         chartUsers.add({
           "id": element['uuid'] != null ? element['uuid'] : "null",
           "focusTime":
-              element["available"] != null ? element["available"] : "null",
+              element["total"] != null ? element["total"] : "null",
           "name": currentUser["first_name"],
           "surname": currentUser["last_name"],
           "profile_picture": currentUser["profile_picture"] != null

@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 import 'dart:ui';
 import 'package:android_alarm_manager_plus/android_alarm_manager_plus.dart';
@@ -11,6 +12,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_circular_slider/flutter_circular_slider.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:is_lock_screen/is_lock_screen.dart';
+import 'package:provider/provider.dart';
 import 'package:rive/rive.dart';
 import 'package:sloff/components/FadeNavigation.dart';
 import 'package:sloff/components/SloffModals.dart';
@@ -21,16 +23,11 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sloff/pages/FocusSuccess.dart';
 import 'package:sloff/services/SloffApi.dart';
 import 'package:sloff/services/alarmManager.dart';
+import 'package:sloff/services/provider/TimerNotifier.dart';
 
 class SloffTimer extends StatefulWidget {
   SloffTimer(
-      {Key key,
-      this.goToRewards,
-      this.uuid,
-      this.company,
-      this.groupFocusMinutes,
-      this.isGroupChallenge,
-      this.totalChallengeFocus})
+      {Key key, this.goToRewards, this.uuid, this.company})
       : super(key: key);
 
   @override
@@ -39,9 +36,6 @@ class SloffTimer extends StatefulWidget {
   final Function goToRewards;
   final String uuid;
   final String company;
-  final int groupFocusMinutes;
-  final bool isGroupChallenge;
-  final int totalChallengeFocus;
 }
 
 class _SloffTimerState extends State<SloffTimer> with WidgetsBindingObserver {
@@ -53,7 +47,6 @@ class _SloffTimerState extends State<SloffTimer> with WidgetsBindingObserver {
   int secondsToEnd = 0;
   int minutesToWrite = 0;
   Artboard _riveArtboard;
-  // ignore: unused_field
   RiveAnimationController _riveController;
   bool isRunning = false;
   int _currentIndex = 0;
@@ -78,6 +71,8 @@ class _SloffTimerState extends State<SloffTimer> with WidgetsBindingObserver {
   int minutesToGroupChallenge = 0;
   String appState = "RESUMED";
   ValueKey<DateTime> forceRebuild;
+  var initialRanking;
+  var finalRanking;
 
   void _updateLabels(int init, int end, int laps) {
     if (_currentIndex != 1) {
@@ -190,7 +185,7 @@ class _SloffTimerState extends State<SloffTimer> with WidgetsBindingObserver {
     });
 
     // Start main timer
-    timer = new Timer.periodic(Duration(seconds: 1), (timer) {
+    timer = new Timer.periodic(Duration(seconds: 1), (timer) async {
       if (secondsToEnd > 0) {
         setState(() {
           secondsToEnd -= 1;
@@ -201,7 +196,7 @@ class _SloffTimerState extends State<SloffTimer> with WidgetsBindingObserver {
       }
 
       if (secondsToEnd == 0) {
-        writeDb(minutesToWrite);
+        await writeDb(minutesToWrite);
         stop(false, true);
         prefs.setBool("timeRecorded", true);
       }
@@ -256,9 +251,12 @@ class _SloffTimerState extends State<SloffTimer> with WidgetsBindingObserver {
             pushWithFade(
                 context,
                 FocusSuccess(
-                    company: widget.company,
-                    uuid: widget.uuid,
-                    minutes: minutesToWrite),
+                  company: widget.company,
+                  uuid: widget.uuid,
+                  minutes: minutesToWrite,
+                  initialRanking: int.parse(initialRanking),
+                  finalRanking: int.parse(finalRanking),
+                ),
                 500);
             /* SloffModals.focusCompleted(context, minutesToWrite, name,
                 widget.goToRewards, widget.company); */
@@ -305,6 +303,10 @@ class _SloffTimerState extends State<SloffTimer> with WidgetsBindingObserver {
   }
 
   Future<void> writeDb(int minutes) async {
+    var token = await FirebaseAuth.instance.currentUser.getIdToken();
+
+    initialRanking = await SloffApi.findRanking(uuid: uuid, token: token);
+
     // Update the user focus
     FirebaseFirestore.instance.collection("focus").doc(uuid).update({
       "available": FieldValue.increment(minutes),
@@ -313,12 +315,28 @@ class _SloffTimerState extends State<SloffTimer> with WidgetsBindingObserver {
 
     DateFormat dateFormat = DateFormat("dd-MM-yyyy");
 
-    FirebaseFirestore.instance
+    var dateQuery = await FirebaseFirestore.instance
         .collection("focus")
         .doc(uuid)
         .collection("daily")
         .doc(dateFormat.format(DateTime.now()))
-        .update({"focus": FieldValue.increment(minutes)});
+        .get();
+
+    if (dateQuery.exists) {
+      FirebaseFirestore.instance
+          .collection("focus")
+          .doc(uuid)
+          .collection("daily")
+          .doc(dateFormat.format(DateTime.now()))
+          .update({"focus": FieldValue.increment(minutes)});
+    } else {
+      FirebaseFirestore.instance
+          .collection("focus")
+          .doc(uuid)
+          .collection("daily")
+          .doc(dateFormat.format(DateTime.now()))
+          .set({"focus": FieldValue.increment(minutes)});
+    }
 
     // Update stats used to populate user progression charts on Sloff Panel
     var today = DateFormat("dd-MM-yyyy").format(DateTime.now());
@@ -346,15 +364,14 @@ class _SloffTimerState extends State<SloffTimer> with WidgetsBindingObserver {
           .set({"focus": minutes});
     }
 
-    // Add or update user chart data, fetched through the api
-    var token = await FirebaseAuth.instance.currentUser.getIdToken();
-    var currentUser = await SloffApi.getFocus(uuid, token);
+    // Add or update user chart data, fetched through the API
+    await SloffApi.increaseFocus(uuid, minutes, token);
 
-    if (currentUser == "NULL") {
-      await SloffApi.createFocus(uuid, minutes, token);
-    } else {
-      await SloffApi.updateFocus(uuid, minutes, token);
-    }
+    //focus = jsonDecode(await SloffApi.getAllFocus(token));
+
+    finalRanking = await SloffApi.findRanking(uuid: uuid, token: token);
+
+    await Provider.of<TimerNotifier>(context, listen: false).getGroupFocus();
   }
 
   @override
@@ -510,10 +527,8 @@ class _SloffTimerState extends State<SloffTimer> with WidgetsBindingObserver {
 
       setState(() async {
         if (await isLockScreen()) {
-          //prefs.setBool("lockscreen", true);
           outsideApp = true;
         } else {
-          //prefs.setBool("lockscreen", false);
           outsideApp = true;
         }
       });
@@ -651,22 +666,21 @@ class _SloffTimerState extends State<SloffTimer> with WidgetsBindingObserver {
                     ],
                   )),
                   RectangleButton(
-                      onTap:
-                          minutesToEnd > 0
+                      onTap: minutesToEnd > 0
                           ? isRunning
                               ? () => stop(true, null)
                               : () => start()
                           : () {},
-                          /* () => FirebaseAuth.instance.currentUser
+                      /* () => FirebaseAuth.instance.currentUser
                               .getIdToken()
                               .then((token) => SloffApi.getCompanyGroupFocus(
                                   companyID: widget.company, token: token)), */
-                          /* () => pushWithFade(
+                      /* () => pushWithFade(
                               context,
                               FocusSuccess(
                                   company: widget.company,
                                   uuid: widget.uuid,
-                                  minutes: minutesToWrite),
+                                  minutes: 0),
                               0), */
                       color: !isRunning
                           ? new Color(0xFFFF6926)

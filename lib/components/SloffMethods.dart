@@ -1,8 +1,10 @@
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_functions/cloud_functions.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:sloff/services/SloffApi.dart';
 
 class SloffMethods {
   static Future<void> sendNotification(
@@ -226,6 +228,9 @@ class SloffMethods {
                       .doc()
                       .set(rewardToWrite);
                 }
+
+                var token = await FirebaseAuth.instance.currentUser.getIdToken();
+                SloffApi.subtractFocus(uuid, rewardToWrite['total_focus'] * 60, token);
               }).then((value) {
                 goToProfile();
               });
