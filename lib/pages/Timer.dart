@@ -369,7 +369,6 @@ class _SloffTimerState extends State<SloffTimer> with WidgetsBindingObserver {
 
     finalRanking = await SloffApi.findRanking(uuid: uuid, token: token);
 
-    await Provider.of<TimerNotifier>(context, listen: false).getGroupFocus();
     await Provider.of<TimerNotifier>(context, listen: false)
         .getIndividualFocus(token);
     Provider.of<TimerNotifier>(context, listen: false)

@@ -1,8 +1,11 @@
+import 'dart:async';
 import 'dart:convert';
+import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:sloff/components/Animations.dart';
 import 'package:sloff/components/SloffModals.dart';
@@ -27,8 +30,23 @@ class _ChartsState extends State<Charts> {
   Future initialisation;
   List chartUsers = [];
   int userRanking = 0;
+  bool loading = false;
+  List loadingPhrases = [
+    "Squeezing focus...",
+    "Fixing timers...",
+    "Calculating minutes...",
+    "Predicting rewards..."
+  ];
 
   Future<bool> initialise() async {
+    var loadingTimer = Timer.periodic(Duration(seconds: 8), (timer) {
+      Navigator.pop(context);
+    });
+
+    setState(() {
+      loading = true;
+    });
+
     // Get the user's profile picture
     var query1 = await FirebaseFirestore.instance
         .collection("users")
@@ -73,11 +91,10 @@ class _ChartsState extends State<Charts> {
 
       if (currentUser != "NULL") {
         currentUser = jsonDecode(currentUser);
-        
+
         chartUsers.add({
           "id": element['uuid'] != null ? element['uuid'] : "null",
-          "focusTime":
-              element["total"] != null ? element["total"] : "null",
+          "focusTime": element["total"] != null ? element["total"] : "null",
           "name": currentUser["first_name"],
           "surname": currentUser["last_name"],
           "profile_picture": currentUser["profile_picture"] != null
@@ -95,6 +112,11 @@ class _ChartsState extends State<Charts> {
       }
     });
 
+    setState(() {
+      loading = false;
+    });
+
+    loadingTimer.cancel();
     return true;
   }
 
@@ -108,274 +130,328 @@ class _ChartsState extends State<Charts> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        color: new Color(0xFFFFF8ED),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            // Top menu
-            Container(
-              height: MediaQuery.of(context).size.height * 0.25,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  Container(height: 50),
-                  // Header
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 30),
-                    child: Stack(
-                      alignment: Alignment.center,
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            GestureDetector(
-                              onTap: () => Navigator.pop(context),
-                              child: Container(
-                                height: 45,
-                                width: 45,
-                                decoration: BoxDecoration(
-                                    color: new Color(0xFFE9E1DB),
-                                    borderRadius: BorderRadius.circular(6)),
-                                child: Center(child: Icon(Icons.close)),
-                              ),
-                            ),
-                            Row(
-                              children: [
-                                SizedBox(
-                                    height: 23,
-                                    width: 23,
-                                    child: SvgPicture.asset(
-                                        "assets/images/Charts/time.svg")),
-                                Container(width: 10),
-                                Text("15 gg",
-                                    style: TextStyle(
-                                        color: Colors.red,
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.bold)),
-                              ],
-                            )
-                          ],
-                        ),
-                        Text("charts".tr(),
-                            style: TextStyle(
-                                color: new Color(0xFF190E3B),
-                                fontSize: 24,
-                                fontFamily: "Poppins-Regular",
-                                fontWeight: FontWeight.bold)),
-                      ],
+      body: AnimatedSwitcher(
+        duration: Duration(milliseconds: 500),
+        child: loading
+            ? GestureDetector(
+                onTap: () => Navigator.pop(context),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    SpinKitRotatingCircle(
+                      color: new Color(0xFF190E3B),
+                      size: 50.0,
                     ),
-                  ),
-
-/*                   // Charts & prizes menu
-                  Padding(
-                    padding: EdgeInsets.only(top: 30, left: 30, right: 30),
-                    child: Row(
-                      children: [
-                        Text("charts".tr(),
-                            style: TextStyle(
-                                fontFamily: "Poppins-Regular",
-                                color: new Color(0xFF694EFF),
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold)),
-                        Container(width: 40),
-                        Text("prizes".tr(),
-                            style: TextStyle(
-                                color: new Color(0xFF190E3B),
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold)),
-                      ],
-                    ),
-                  ), */
-
-                  // Separator
-                  Container(
-                    margin: EdgeInsets.only(top: 15),
-                    height: 1.5,
-                    color: new Color(0xFFE9E1DB),
-                  ),
-
-                  // Alert box
-                  Container(
-                    height: 50,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        Container(
-                            height: 40,
-                            width: MediaQuery.of(context).size.width * 0.9,
-                            decoration: BoxDecoration(
-                                color: new Color(0xFFD9F8E7),
-                                borderRadius: BorderRadius.circular(6)),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                Text("chart-alert-1".tr(),
-                                    style: TextStyle(
-                                        color: new Color(0xFF190E3B),
-                                        fontSize: 15,
-                                        fontWeight: FontWeight.normal)),
-                                Text("chart-alert-2".tr(),
-                                    style: TextStyle(
-                                        color: new Color(0xFF190E3B),
-                                        fontSize: 15,
-                                        fontWeight: FontWeight.bold)),
-                              ],
-                            )),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-
-            // Chart ListView
-            FutureBuilder(
-                future: initialisation,
-                builder: (context, snapshot) {
-                  if (!snapshot.hasData) {
-                    return Container();
-                  } else if (snapshot.hasError) {
-                    return Container();
-                  } else {
-                    return SlideFadeIn(
-                      0,
-                      Stack(
-                        alignment: Alignment.bottomCenter,
+                    Container(height: 50),
+                    Text(loadingPhrases[new Random().nextInt(4)],
+                        style: TextStyle(
+                            color: new Color(0xFF190E3B),
+                            fontSize: 11,
+                            fontWeight: FontWeight.bold)),
+                  ],
+                ),
+              )
+            : Container(
+                color: new Color(0xFFFFF8ED),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    // Top menu
+                    Container(
+                      height: MediaQuery.of(context).size.height * 0.25,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
                         children: [
-                          Container(
-                            height: MediaQuery.of(context).size.height * 0.75,
-                            child: ListView.builder(
-                              itemCount: chartUsers.length,
-                              padding: EdgeInsets.only(top: 0, bottom: 180),
-                              itemBuilder: (context, index) {
-                                return ChartUserCard(
-                                    profilePictureUrl: chartUsers[index]
-                                        ["profile_picture"],
-                                    name: chartUsers[index]["name"],
-                                    surname: chartUsers[index]["surname"],
-                                    widget: widget,
-                                    index: index);
-                              },
-                            ),
-                          ),
-
-                          // Footer with user info
-                          GestureDetector(
-                            child: Container(
-                              height: 160,
-                              decoration: BoxDecoration(
-                                  color: new Color(0xFFE4D4F4),
-                                  borderRadius: BorderRadius.only(
-                                      topLeft: Radius.circular(40),
-                                      topRight: Radius.circular(40))),
-                              child: Padding(
-                                padding: const EdgeInsets.only(
-                                    left: 30, right: 30, bottom: 30),
-                                child: Row(
+                          Container(height: 50),
+                          // Header
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 30),
+                            child: Stack(
+                              alignment: Alignment.center,
+                              children: [
+                                Row(
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceBetween,
                                   children: [
+                                    GestureDetector(
+                                      onTap: () => Navigator.pop(context),
+                                      child: Container(
+                                        height: 45,
+                                        width: 45,
+                                        decoration: BoxDecoration(
+                                            color: new Color(0xFFE9E1DB),
+                                            borderRadius:
+                                                BorderRadius.circular(6)),
+                                        child: Center(child: Icon(Icons.close)),
+                                      ),
+                                    ),
                                     Row(
                                       children: [
-                                        // Ranking position
-                                        Text("$userRanking°",
+                                        SizedBox(
+                                            height: 23,
+                                            width: 23,
+                                            child: SvgPicture.asset(
+                                                "assets/images/Charts/time.svg")),
+                                        Container(width: 10),
+                                        Text("15 gg",
                                             style: TextStyle(
-                                                fontFamily: "Poppins-Regular",
-                                                color: new Color(0xFF694EFF),
-                                                fontSize: 20,
-                                                fontWeight: FontWeight.bold)),
-
-                                        // Profile picture
-                                        FutureBuilder(
-                                            future: initialisation,
-                                            builder: (context, snapshot) {
-                                              if (!snapshot.hasData) {
-                                                return Container();
-                                              } else if (snapshot.hasError) {
-                                                return Container();
-                                              } else {
-                                                return AnimatedOpacity(
-                                                  duration: Duration(
-                                                      milliseconds: 400),
-                                                  opacity: snapshot.data == true
-                                                      ? 1
-                                                      : 0,
-                                                  child: Container(
-                                                      margin: EdgeInsets.only(
-                                                          right: 20, left: 35),
-                                                      height: 80,
-                                                      width: 80,
-                                                      decoration: BoxDecoration(
-                                                          borderRadius:
-                                                              BorderRadius
-                                                                  .circular(
-                                                                      100),
-                                                          color: Colors.grey,
-                                                          image: DecorationImage(
-                                                              fit: BoxFit.cover,
-                                                              image: NetworkImage(
-                                                                  profilePictureUrl)))),
-                                                );
-                                              }
-                                            }),
-
-                                        // User name
-                                        Text(widget.name + " " + widget.surname,
-                                            style: TextStyle(
-                                                color: new Color(0xFF190E3B),
-                                                fontFamily: "Poppins-Regular",
-                                                fontSize: 18,
+                                                color: Colors.red,
+                                                fontSize: 16,
                                                 fontWeight: FontWeight.bold)),
                                       ],
-                                    ),
-
-                                    // User focus
-                                    FutureBuilder(
-                                        future: initialisation,
-                                        builder: (context, snapshot) {
-                                          if (!snapshot.hasData) {
-                                            return Container();
-                                          } else if (snapshot.hasError) {
-                                            return Container();
-                                          } else {
-                                            return AnimatedOpacity(
-                                              duration:
-                                                  Duration(milliseconds: 400),
-                                              opacity:
-                                                  snapshot.data == true ? 1 : 0,
-                                              child: Text(
-                                                  focusTime < 60
-                                                      ? focusTime.toString() +
-                                                          " min"
-                                                      : (focusTime / 60)
-                                                              .round()
-                                                              .toString() +
-                                                          " hr",
-                                                  style: TextStyle(
-                                                      color:
-                                                          new Color(0xFF190E3B),
-                                                      fontSize: 18,
-                                                      fontFamily:
-                                                          "Poppins-Regular",
-                                                      fontWeight:
-                                                          FontWeight.bold)),
-                                            );
-                                          }
-                                        }),
+                                    )
                                   ],
                                 ),
-                              ),
+                                Text("charts".tr(),
+                                    style: TextStyle(
+                                        color: new Color(0xFF190E3B),
+                                        fontSize: 24,
+                                        fontFamily: "Poppins-Regular",
+                                        fontWeight: FontWeight.bold)),
+                              ],
+                            ),
+                          ),
+
+                          /*                   // Charts & prizes menu
+                    Padding(
+                      padding: EdgeInsets.only(top: 30, left: 30, right: 30),
+                      child: Row(
+                        children: [
+                          Text("charts".tr(),
+                              style: TextStyle(
+                                  fontFamily: "Poppins-Regular",
+                                  color: new Color(0xFF694EFF),
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold)),
+                          Container(width: 40),
+                          Text("prizes".tr(),
+                              style: TextStyle(
+                                  color: new Color(0xFF190E3B),
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold)),
+                        ],
+                      ),
+                    ), */
+
+                          // Separator
+                          Container(
+                            margin: EdgeInsets.only(top: 15),
+                            height: 1.5,
+                            color: new Color(0xFFE9E1DB),
+                          ),
+
+                          // Alert box
+                          Container(
+                            height: 50,
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                Container(
+                                    height: 40,
+                                    width:
+                                        MediaQuery.of(context).size.width * 0.9,
+                                    decoration: BoxDecoration(
+                                        color: new Color(0xFFD9F8E7),
+                                        borderRadius: BorderRadius.circular(6)),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
+                                      children: [
+                                        Text("chart-alert-1".tr(),
+                                            style: TextStyle(
+                                                color: new Color(0xFF190E3B),
+                                                fontSize: 15,
+                                                fontWeight: FontWeight.normal)),
+                                        Text("chart-alert-2".tr(),
+                                            style: TextStyle(
+                                                color: new Color(0xFF190E3B),
+                                                fontSize: 15,
+                                                fontWeight: FontWeight.bold)),
+                                      ],
+                                    )),
+                              ],
                             ),
                           ),
                         ],
                       ),
-                    );
-                  }
-                })
-          ],
-        ),
+                    ),
+
+                    // Chart ListView
+                    FutureBuilder(
+                        future: initialisation,
+                        builder: (context, snapshot) {
+                          if (!snapshot.hasData) {
+                            return Container();
+                          } else if (snapshot.hasError) {
+                            return Container();
+                          } else {
+                            return SlideFadeIn(
+                              0,
+                              Stack(
+                                alignment: Alignment.bottomCenter,
+                                children: [
+                                  Container(
+                                    height: MediaQuery.of(context).size.height *
+                                        0.75,
+                                    child: ListView.builder(
+                                      itemCount: chartUsers.length,
+                                      padding:
+                                          EdgeInsets.only(top: 0, bottom: 180),
+                                      itemBuilder: (context, index) {
+                                        return ChartUserCard(
+                                            profilePictureUrl: chartUsers[index]
+                                                ["profile_picture"],
+                                            name: chartUsers[index]["name"],
+                                            surname: chartUsers[index]
+                                                ["surname"],
+                                            widget: widget,
+                                            index: index);
+                                      },
+                                    ),
+                                  ),
+
+                                  // Footer with user info
+                                  GestureDetector(
+                                    child: Container(
+                                      height: 160,
+                                      decoration: BoxDecoration(
+                                          color: new Color(0xFFE4D4F4),
+                                          borderRadius: BorderRadius.only(
+                                              topLeft: Radius.circular(40),
+                                              topRight: Radius.circular(40))),
+                                      child: Padding(
+                                        padding: const EdgeInsets.only(
+                                            left: 30, right: 30, bottom: 30),
+                                        child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Row(
+                                              children: [
+                                                // Ranking position
+                                                Text("$userRanking°",
+                                                    style: TextStyle(
+                                                        fontFamily:
+                                                            "Poppins-Regular",
+                                                        color: new Color(
+                                                            0xFF694EFF),
+                                                        fontSize: 20,
+                                                        fontWeight:
+                                                            FontWeight.bold)),
+
+                                                // Profile picture
+                                                FutureBuilder(
+                                                    future: initialisation,
+                                                    builder:
+                                                        (context, snapshot) {
+                                                      if (!snapshot.hasData) {
+                                                        return Container();
+                                                      } else if (snapshot
+                                                          .hasError) {
+                                                        return Container();
+                                                      } else {
+                                                        return AnimatedOpacity(
+                                                          duration: Duration(
+                                                              milliseconds:
+                                                                  400),
+                                                          opacity:
+                                                              snapshot.data ==
+                                                                      true
+                                                                  ? 1
+                                                                  : 0,
+                                                          child: Container(
+                                                              margin: EdgeInsets
+                                                                  .only(
+                                                                      right: 20,
+                                                                      left: 35),
+                                                              height: 80,
+                                                              width: 80,
+                                                              decoration: BoxDecoration(
+                                                                  borderRadius:
+                                                                      BorderRadius
+                                                                          .circular(
+                                                                              100),
+                                                                  color:
+                                                                      Colors
+                                                                          .grey,
+                                                                  image: DecorationImage(
+                                                                      fit: BoxFit
+                                                                          .cover,
+                                                                      image: NetworkImage(
+                                                                          profilePictureUrl)))),
+                                                        );
+                                                      }
+                                                    }),
+
+                                                // User name
+                                                Text(
+                                                    widget.name +
+                                                        " " +
+                                                        widget.surname,
+                                                    style: TextStyle(
+                                                        color: new Color(
+                                                            0xFF190E3B),
+                                                        fontFamily:
+                                                            "Poppins-Regular",
+                                                        fontSize: 18,
+                                                        fontWeight:
+                                                            FontWeight.bold)),
+                                              ],
+                                            ),
+
+                                            // User focus
+                                            FutureBuilder(
+                                                future: initialisation,
+                                                builder: (context, snapshot) {
+                                                  if (!snapshot.hasData) {
+                                                    return Container();
+                                                  } else if (snapshot
+                                                      .hasError) {
+                                                    return Container();
+                                                  } else {
+                                                    return AnimatedOpacity(
+                                                      duration: Duration(
+                                                          milliseconds: 400),
+                                                      opacity:
+                                                          snapshot.data == true
+                                                              ? 1
+                                                              : 0,
+                                                      child: Text(
+                                                          focusTime < 60
+                                                              ? focusTime
+                                                                      .toString() +
+                                                                  " min"
+                                                              : (focusTime / 60)
+                                                                      .round()
+                                                                      .toString() +
+                                                                  " hr",
+                                                          style: TextStyle(
+                                                              color: new Color(
+                                                                  0xFF190E3B),
+                                                              fontSize: 18,
+                                                              fontFamily:
+                                                                  "Poppins-Regular",
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold)),
+                                                    );
+                                                  }
+                                                }),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            );
+                          }
+                        })
+                  ],
+                ),
+              ),
       ),
     );
   }

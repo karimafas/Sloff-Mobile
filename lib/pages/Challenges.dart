@@ -19,8 +19,7 @@ class Challenge extends StatefulWidget {
       {Key key,
       this.goToProfile,
       this.uuid,
-      this.company,
-      this.groupFocusMinutes})
+      this.company})
       : super(key: key);
 
   @override
@@ -31,7 +30,6 @@ class Challenge extends StatefulWidget {
   final Function goToProfile;
   final String uuid;
   final String company;
-  final int groupFocusMinutes;
 }
 
 class _Challenge extends State<Challenge> with SingleTickerProviderStateMixin {
