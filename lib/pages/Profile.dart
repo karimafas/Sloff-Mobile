@@ -5,8 +5,10 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_launcher_icons/xml_templates.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:provider/provider.dart';
 import 'package:sloff/components/FadeNavigation.dart';
 import 'package:sloff/components/SloffMethods.dart';
 import 'package:sloff/components/Reward.dart';
@@ -17,6 +19,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sloff/components/ProfileMenu.dart';
 import 'package:sloff/pages/Charts.dart';
 import 'package:sloff/services/SloffApi.dart';
+import 'package:sloff/services/provider/TimerNotifier.dart';
+import 'package:transparent_image/transparent_image.dart';
 
 class UserProfile extends StatefulWidget {
   const UserProfile({Key key, this.uuid, this.company}) : super(key: key);
@@ -32,10 +36,7 @@ class UserProfile extends StatefulWidget {
 
 class _Profile extends State<UserProfile> {
   GlobalKey<ScaffoldState> _drawerKey = new GlobalKey();
-  String name;
-  String surname;
   bool loadingImage = false;
-  String cause;
   bool loading = true;
   bool visible = true;
   List<String> images = [
@@ -81,6 +82,9 @@ class _Profile extends State<UserProfile> {
             }
           });
 
+          await Provider.of<TimerNotifier>(context, listen: false)
+              .loadUserData();
+
           setState(() {
             loadingImage = false;
           });
@@ -89,36 +93,8 @@ class _Profile extends State<UserProfile> {
     }
   }
 
-  void fetchInfo() async {
-    DocumentSnapshot query = await FirebaseFirestore.instance
-        .collection('users')
-        .doc(widget.uuid)
-        .get();
-    DocumentSnapshot query1 = await FirebaseFirestore.instance
-        .collection('users_cause')
-        .doc(widget.uuid)
-        .get();
-
-    if (query['name'].toString() == '') {
-      name = '     ';
-    } else {
-      name = query['name'].toString();
-    }
-    if (query['surname'].toString() == '') {
-      surname = '     ';
-    } else {
-      surname = query['surname'].toString();
-    }
-    if (query1['cause'].toString() == '') {
-      cause = '';
-    } else {
-      cause = query1['cause'].toString();
-    }
-  }
-
   void initState() {
     super.initState();
-    fetchInfo();
   }
 
   @override
@@ -135,398 +111,150 @@ class _Profile extends State<UserProfile> {
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 70, sigmaY: 70),
-          child: Scaffold(
-              key: _drawerKey,
-              endDrawer: Theme(
-                child: DrawerUiWidget(company: widget.company),
-                data: Theme.of(context).copyWith(
-                  canvasColor: Colors.transparent,
-                ),
+    return Stack(children: [
+      Consumer<TimerNotifier>(builder: (context, data, index) {
+        return Scaffold(
+            key: _drawerKey,
+            endDrawer: Theme(
+              child: DrawerUiWidget(company: widget.company),
+              data: Theme.of(context).copyWith(
+                canvasColor: Colors.transparent,
               ),
-              appBar: AppBar(
-                backgroundColor: Colors.transparent,
-                title: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 10),
-                  child: Text("Profilo".tr(),
-                      textAlign: TextAlign.left,
-                      style: new TextStyle(
-                          fontFamily: "GrandSlang",
-                          fontSize: 24,
-                          color: new Color(0xFF190E3B))),
-                ),
-                centerTitle: false,
-                actions: <Widget>[
-                  Padding(
-                      padding: new EdgeInsets.only(right: 15),
-                      child: IconButton(
-                        icon: SvgPicture.asset(
-                          'assets/images/Profilo/Menu.svg',
-                          fit: BoxFit.cover,
-                          height: 16,
-                        ),
-                        onPressed: () =>
-                            _drawerKey.currentState.openEndDrawer(),
-                      )),
-                ],
-                elevation: 0,
-              ),
+            ),
+            appBar: AppBar(
               backgroundColor: Colors.transparent,
-              body: SingleChildScrollView(
-                  controller: _controller,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Container(
-                          width: MediaQuery.of(context).size.width,
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 40),
-                            child: Row(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                // Social Causes
-                                /* SizedBox(
-                                  height: 130,
-                                  width: 100,
-                                  child: GestureDetector(
-                                      onTap: () async {
-                                        SharedPreferences prefs =
-                                            await SharedPreferences
-                                                .getInstance();
-                                        String uuid = prefs.getString('uuid');
-
-                                        FirebaseFirestore.instance
-                                            .collection('users_cause')
-                                            .doc(uuid)
-                                            .get()
-                                            .then((value) {
-                                          Navigator.of(context).push(
-                                              MaterialPageRoute(
-                                                  builder: (context) =>
-                                                      CambioCausa(
-                                                        selectedCauseIndex:
-                                                            value['cause'],
-                                                        inside: true,
-                                                      )));
-                                        });
-                                      },
-                                      child: Column(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.center,
-                                          children: [
-                                            StreamBuilder(
-                                                stream: FirebaseFirestore
-                                                    .instance
-                                                    .collection('users_cause')
-                                                    .doc(widget.uuid)
-                                                    .snapshots(),
-                                                builder: (context, snapshot) {
-                                                  if (!snapshot.hasData) {
-                                                    return Container();
-                                                  } else if (!snapshot
-                                                      .data.exists) {
-                                                    return Container();
-                                                  } else {
-                                                    return CircleAvatar(
-                                                      radius: 25,
-                                                      backgroundImage: snapshot
-                                                                      .data[
-                                                                  'cause'] !=
-                                                              ''
-                                                          ? AssetImage(
-                                                              images[
-                                                                  snapshot.data[
-                                                                      'cause']],
-                                                            )
-                                                          : NetworkImage(
-                                                              'https://firebasestorage.googleapis.com/v0/b/sloff-1c2f2.appspot.com/o/Animal_Equality.png?alt=media&token=d0fd5b14-6e68-4c22-b088-54bab84312be'),
-                                                    );
-                                                  }
-                                                }),
-                                            Container(
-                                              height: 6,
+              title: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 10),
+                child: Text("Profilo".tr(),
+                    textAlign: TextAlign.left,
+                    style: new TextStyle(
+                        fontFamily: "GrandSlang",
+                        fontSize: 24,
+                        color: new Color(0xFF190E3B))),
+              ),
+              centerTitle: false,
+              actions: <Widget>[
+                Padding(
+                    padding: new EdgeInsets.only(right: 15),
+                    child: IconButton(
+                      icon: SvgPicture.asset(
+                        'assets/images/Profilo/Menu.svg',
+                        fit: BoxFit.cover,
+                        height: 16,
+                      ),
+                      onPressed: () => _drawerKey.currentState.openEndDrawer(),
+                    )),
+              ],
+              elevation: 0,
+            ),
+            backgroundColor: Colors.transparent,
+            body: SingleChildScrollView(
+                controller: _controller,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Container(
+                        width: MediaQuery.of(context).size.width,
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 40),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              // Profile picture
+                              Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    GestureDetector(
+                                      child: Stack(
+                                        alignment: Alignment.center,
+                                        children: [
+                                          Container(
+                                            decoration: BoxDecoration(
+                                              border: Border.all(
+                                                  color: data.profile_picture !=
+                                                          ""
+                                                      ? new Color(0xFF190E3B)
+                                                      : Colors.transparent,
+                                                  width: 3.5),
+                                              borderRadius:
+                                                  BorderRadius.circular(100),
                                             ),
-                                            Text(
-                                              'Causa'.tr(),
-                                              textAlign: TextAlign.center,
-                                              style: TextStyle(
-                                                  color: new Color(0xFF694EFF),
-                                                  fontFamily: 'Poppins-Regular',
-                                                  fontSize: 11,
-                                                  fontWeight: FontWeight.bold),
-                                            ),
-                                          ])),
-                                ), */
-
-                                // Profile picture
-                                Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
-                                    children: [
-                                      StreamBuilder(
-                                          stream: FirebaseFirestore.instance
-                                              .collection("users")
-                                              .doc(widget.uuid)
-                                              .snapshots(),
-                                          builder: (context, snapshot) {
-                                            if (!snapshot.hasData) {
-                                              return Container();
-                                            } else if (snapshot.hasError) {
-                                              return Container();
-                                            } else {
-                                              profilePictureUrl = snapshot
-                                                  .data["profile_picture"];
-
-                                              return GestureDetector(
-                                                child: Stack(
-                                                  alignment: Alignment.center,
-                                                  children: [
-                                                    Container(
-                                                      decoration: BoxDecoration(
-                                                        border: Border.all(
-                                                            color: snapshot.data[
-                                                                        "profile_picture"] !=
-                                                                    ""
-                                                                ? new Color(
-                                                                    0xFF190E3B)
-                                                                : Colors
-                                                                    .transparent,
-                                                            width: 3.5),
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(100),
+                                            child: Padding(
+                                                padding:
+                                                    const EdgeInsets.all(4),
+                                                child: SizedBox(
+                                                    height: 100,
+                                                    width: 100,
+                                                    child: PhysicalModel(
+                                                      clipBehavior: Clip
+                                                          .antiAliasWithSaveLayer,
+                                                      color: Colors.black,
+                                                      shape: BoxShape.circle,
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              100),
+                                                      child: FadeInImage
+                                                          .memoryNetwork(
+                                                        width: MediaQuery.of(
+                                                                    context)
+                                                                .size
+                                                                .width *
+                                                            0.3,
+                                                        image: data
+                                                            .profile_picture,
+                                                        placeholder:
+                                                            kTransparentImage,
+                                                        fit: BoxFit.cover,
                                                       ),
-                                                      child: Padding(
-                                                        padding:
-                                                            const EdgeInsets
-                                                                .all(4),
-                                                        child: Container(
-                                                          child: snapshot.data[
-                                                                      "profile_picture"] ==
-                                                                  ""
-                                                              ? Icon(
-                                                                  Icons
-                                                                      .photo_camera_outlined,
-                                                                  color: Colors
-                                                                      .white
-                                                                      .withOpacity(
-                                                                          .7))
-                                                              : Container(),
-                                                          height: 90,
-                                                          width: 90,
-                                                          decoration: BoxDecoration(
-                                                              image: DecorationImage(
-                                                                  image: NetworkImage(
-                                                                      snapshot.data[
-                                                                          "profile_picture"]),
-                                                                  fit: BoxFit
-                                                                      .cover),
-                                                              borderRadius:
-                                                                  BorderRadius
-                                                                      .circular(
-                                                                          100),
-                                                              color:
-                                                                  Colors.grey),
-                                                        ),
-                                                      ),
-                                                    ),
-                                                    loadingImage
-                                                        ? SizedBox(
-                                                            height: 30,
-                                                            width: 30,
-                                                            child:
-                                                                CircularProgressIndicator(
-                                                              color: Colors
-                                                                  .white
-                                                                  .withOpacity(
-                                                                      .7),
-                                                              strokeWidth: 2,
-                                                            ))
-                                                        : Container(),
-                                                  ],
-                                                ),
-                                                onTap: () =>
-                                                    SloffModals.profilePicture(
-                                                        context,
-                                                        uploadImage,
-                                                        removeImage),
-                                              );
-                                            }
-                                          }),
-                                      Container(
-                                        height: 20,
-                                      )
-                                    ]),
+                                                    ))),
+                                          ),
+                                          loadingImage
+                                              ? SizedBox(
+                                                  height: 30,
+                                                  width: 30,
+                                                  child:
+                                                      CircularProgressIndicator(
+                                                    color: Colors.white
+                                                        .withOpacity(.7),
+                                                    strokeWidth: 2,
+                                                  ))
+                                              : Container(),
+                                        ],
+                                      ),
+                                      onTap: () => SloffModals.profilePicture(
+                                          context, uploadImage, removeImage),
+                                    ),
+                                    Container(
+                                      height: 20,
+                                    )
+                                  ]),
+                            ],
+                          ),
+                        )),
+                    Container(
+                        child: Text(
+                      data.first_name.capitalize() +
+                          " " +
+                          data.last_name.capitalize(),
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                          fontFamily: 'Poppins-Regular',
+                          color: new Color(0xFF190E3B),
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold),
+                    )),
+                    SizedBox(height: 15),
 
-                                // Available focus time
-                                /* SizedBox(
-                                  height: 130,
-                                  width: 100,
-                                  child: Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.start,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.center,
-                                      children: [
-                                        Container(height: 17),
-                                        Stack(
-                                          alignment: Alignment.center,
-                                          children: [
-                                            SizedBox(
-                                                child: SvgPicture.asset(
-                                                    "assets/images/Coupon/focus.svg",
-                                                    height: 50,
-                                                    width: 50)),
-                                            StreamBuilder(
-                                                stream: FirebaseFirestore
-                                                    .instance
-                                                    .collection('users_company')
-                                                    .doc(widget.company)
-                                                    .collection('challenge')
-                                                    .where('elapsed_time',
-                                                        isGreaterThan:
-                                                            DateTime.now())
-                                                    .snapshots(),
-                                                builder: (context, snapshot) {
-                                                  if (!snapshot.hasData) {
-                                                    return Text(
-                                                        ((0).toInt())
-                                                                .toString() +
-                                                            " h",
-                                                        style: TextStyle(
-                                                            color: Colors.white,
-                                                            fontSize: 13,
-                                                            fontWeight:
-                                                                FontWeight
-                                                                    .bold));
-                                                  } else if (snapshot
-                                                          .data.docs.length ==
-                                                      0) {
-                                                    return Text(
-                                                        (0).toString() + "h",
-                                                        style: TextStyle(
-                                                            color: Colors.white,
-                                                            fontSize: 16,
-                                                            fontWeight:
-                                                                FontWeight
-                                                                    .bold));
-                                                  } else {
-                                                    return StreamBuilder(
-                                                        stream:
-                                                            FirebaseFirestore
-                                                                .instance
-                                                                .collection(
-                                                                    'focus')
-                                                                .doc(
-                                                                    widget.uuid)
-                                                                .snapshots(),
-                                                        builder: (context,
-                                                            snapshots) {
-                                                          if (!snapshots
-                                                              .hasData) {
-                                                            return Text(
-                                                                ((0).toInt())
-                                                                        .toString() +
-                                                                    " h",
-                                                                style: TextStyle(
-                                                                    color: Colors
-                                                                        .white,
-                                                                    fontSize:
-                                                                        13,
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .bold));
-                                                          } else {
-                                                            if (!snapshots
-                                                                .data.exists) {
-                                                              return Text(
-                                                                  ((0).toInt())
-                                                                          .toString() +
-                                                                      " h",
-                                                                  style: TextStyle(
-                                                                      color: Colors
-                                                                          .white,
-                                                                      fontSize:
-                                                                          13,
-                                                                      fontWeight:
-                                                                          FontWeight
-                                                                              .bold));
-                                                            } else {
-                                                              return Text(
-                                                                  ((snapshots.data['available'] / 60)
-                                                                              .toInt())
-                                                                          .toString() +
-                                                                      " h",
-                                                                  style: TextStyle(
-                                                                      color: Colors
-                                                                          .white,
-                                                                      fontSize:
-                                                                          13,
-                                                                      fontWeight:
-                                                                          FontWeight
-                                                                              .bold));
-                                                            }
-                                                          }
-                                                        });
-                                                  }
-                                                })
-                                          ],
-                                        ),
-                                        Container(
-                                          height: 6,
-                                        ),
-                                        Text(
-                                          'Focus'.tr(),
-                                          textAlign: TextAlign.center,
-                                          style: TextStyle(
-                                              color: new Color(0xFF190E3B),
-                                              fontFamily: 'Poppins-Regular',
-                                              fontSize: 11,
-                                              fontWeight: FontWeight.bold),
-                                        ),
-                                        Text(
-                                          ''.tr(),
-                                          style: TextStyle(
-                                              color: Colors.black,
-                                              fontSize: 12,
-                                              fontWeight: FontWeight.normal),
-                                        )
-                                      ]),
-                                ) */
-                              ],
-                            ),
-                          )),
-                      Container(
-                          child: name != null
-                              ? Text(
-                                  name.capitalize() +
-                                      " " +
-                                      surname.capitalize(),
-                                  textAlign: TextAlign.center,
-                                  style: TextStyle(
-                                      fontFamily: 'Poppins-Regular',
-                                      color: new Color(0xFF190E3B),
-                                      fontSize: 20,
-                                      fontWeight: FontWeight.bold),
-                                )
-                              : Container()),
-                      SizedBox(height: 15),
-
-                      // User chart ranking
-                      GestureDetector(
+                    // User chart ranking
+                    GestureDetector(
                         onTap: () => pushWithFade(
                             context,
                             Charts(
-                              name: name.capitalize(),
-                              surname: surname.capitalize(),
+                              name: data.first_name.capitalize(),
+                              surname: data.last_name.capitalize(),
                               uuid: widget.uuid,
                             ),
                             300),
@@ -537,215 +265,183 @@ class _Profile extends State<UserProfile> {
                             decoration: BoxDecoration(
                                 color: new Color(0xFFffe7c1).withOpacity(.5),
                                 borderRadius: BorderRadius.circular(6)),
-                            child: StreamBuilder(
-                                stream: FirebaseFirestore.instance
-                                    .collection("focus")
-                                    .doc(widget.uuid)
-                                    .snapshots(),
-                                builder: (context, lastSnapshot) {
-                                  return Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceAround,
-                                    children: [
-                                      Row(
-                                        children: [
-                                          Stack(
-                                            alignment: Alignment.center,
-                                            children: [
-                                              SizedBox(
-                                                height: 33,
-                                                width: 33,
-                                                child: SvgPicture.asset(
-                                                    "assets/images/Charts/empty_star.svg"),
-                                              ),
-                                              Text("1",
-                                                  style: TextStyle(
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                      color: Colors.white,
-                                                      fontFamily:
-                                                          "Poppins-Regular",
-                                                      fontSize: 16))
-                                            ],
-                                          ),
-                                          Container(width: 10),
-                                          Text(
-                                            "chart-place".tr(),
-                                            style: TextStyle(
-                                                fontFamily: "Poppins-Regular",
-                                                fontWeight: FontWeight.bold,
-                                                color: new Color(0xFF190E3B),
-                                                fontSize: 15),
-                                          ),
-                                        ],
-                                      ),
-                                      Text(
-                                        "ranking".tr(),
-                                        style: TextStyle(
-                                            fontFamily: "Poppins-Regular",
-                                            fontWeight: FontWeight.bold,
-                                            color: new Color(0xFFffac00),
-                                            fontSize: 15),
-                                      ),
-                                    ],
-                                  );
-                                })),
-                      ),
-
-                      // CO2 savings
-                      Container(
-                          height: 30,
-                          width: MediaQuery.of(context).size.width * 0.8,
-                          decoration: BoxDecoration(
-                              color: new Color(0xFFd2f9e6),
-                              borderRadius: BorderRadius.circular(6)),
-                          child: StreamBuilder(
-                              stream: FirebaseFirestore.instance
-                                  .collection("focus")
-                                  .doc(widget.uuid)
-                                  .snapshots(),
-                              builder: (context, lastSnapshot) {
-                                return Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceAround,
+                              children: [
+                                Row(
                                   children: [
-                                    Text("CO1".tr(),
-                                        style: TextStyle(fontSize: 13)),
+                                    Stack(
+                                      alignment: Alignment.center,
+                                      children: [
+                                        SizedBox(
+                                          height: 33,
+                                          width: 33,
+                                          child: SvgPicture.asset(
+                                              "assets/images/Charts/empty_star.svg"),
+                                        ),
+                                        Text("1",
+                                            style: TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                                color: Colors.white,
+                                                fontFamily: "Poppins-Regular",
+                                                fontSize: 16))
+                                      ],
+                                    ),
+                                    Container(width: 10),
                                     Text(
-                                        "CO2".tr(namedArgs: {
-                                          "amount": lastSnapshot.data != null
-                                              ? lastSnapshot.data != 0
-                                                  ? 0.22 *
-                                                              lastSnapshot.data[
-                                                                  "total"] <
-                                                          100
-                                                      ? (0.22 *
-                                                                  lastSnapshot
-                                                                          .data[
-                                                                      "total"])
-                                                              .toStringAsFixed(
-                                                                  1) +
-                                                          "g"
-                                                      : (0.22 *
-                                                                  lastSnapshot
-                                                                          .data[
-                                                                      "total"] /
-                                                                  1000)
-                                                              .toStringAsFixed(
-                                                                  1) +
-                                                          "kg"
-                                                  : "0g"
-                                              : "0g"
-                                        }),
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 13)),
-                                    Text("CO3".tr(),
-                                        style: TextStyle(fontSize: 13)),
+                                      "chart-place".tr(),
+                                      style: TextStyle(
+                                          fontFamily: "Poppins-Regular",
+                                          fontWeight: FontWeight.bold,
+                                          color: new Color(0xFF190E3B),
+                                          fontSize: 15),
+                                    ),
                                   ],
-                                );
-                              })),
-                      Container(
-                          padding: EdgeInsets.only(top: 20, bottom: 5),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              SizedBox(
-                                height: 20,
-                                width: 20,
-                                child: SvgPicture.asset(
-                                    'assets/images/Profilo/Coupon_da_utilizzare.svg'),
-                              ),
-                              SizedBox(
-                                width: 10,
-                              ),
-                              Container(
-                                  child: Column(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    'CouponProfilo'.tr() + ' ',
-                                    style: TextStyle(
-                                        color: new Color(0xFF190E3B),
-                                        fontSize: 15,
-                                        fontWeight: FontWeight.w800),
-                                    textAlign: TextAlign.left,
-                                  ),
-                                ],
-                              )),
-                            ],
-                          )),
-                      Container(
-                        height: 10,
-                      ),
-                      Container(
-                          height: 1.5,
-                          width: MediaQuery.of(context).size.width * 0.85,
-                          color: Colors.grey.withOpacity(.2)),
-                      StreamBuilder(
-                          stream: FirebaseFirestore.instance
-                              .collection('users_coupon')
-                              .doc(widget.uuid)
-                              .collection(widget.uuid)
-                              .orderBy('redeemed_at', descending: true)
-                              .snapshots(),
-                          builder: (context, snapshot) {
-                            if (!snapshot.hasData) {
-                              return Container();
-                            }
-                            if (snapshot.hasError) {
-                              return Container();
-                            } else {
-                              print(snapshot.data.docs.length);
-                              return ListView.builder(
-                                physics: const NeverScrollableScrollPhysics(),
-                                scrollDirection: Axis.vertical,
-                                shrinkWrap: true,
-                                itemBuilder: (context, index) => buildItem(
-                                    context, snapshot.data.docs[index]),
-                                itemCount: snapshot.data.docs.length,
-                              );
-                            }
-                          }),
-                      SizedBox(height: 10),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          RichText(
-                            textAlign: TextAlign.center,
-                            text: TextSpan(
-                              text: "profile-end-1".tr(),
-                              style: TextStyle(
-                                  fontFamily: 'Poppins-Regular',
-                                  fontWeight: FontWeight.normal,
-                                  fontSize: 10,
-                                  color: new Color(0xFF190E3B)),
-                              children: <TextSpan>[
-                                TextSpan(
-                                    text: "profile-end-2".tr(),
-                                    style:
-                                        TextStyle(fontWeight: FontWeight.bold)),
-                                TextSpan(text: "profile-end-3".tr()),
+                                ),
+                                Text(
+                                  "ranking".tr(),
+                                  style: TextStyle(
+                                      fontFamily: "Poppins-Regular",
+                                      fontWeight: FontWeight.bold,
+                                      color: new Color(0xFFffac00),
+                                      fontSize: 15),
+                                ),
                               ],
+                            ))),
+
+                    // CO2 savings
+                    Container(
+                        height: 30,
+                        width: MediaQuery.of(context).size.width * 0.8,
+                        decoration: BoxDecoration(
+                            color: new Color(0xFFd2f9e6),
+                            borderRadius: BorderRadius.circular(6)),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text("CO1".tr(), style: TextStyle(fontSize: 13)),
+                            Text(
+                                "CO2".tr(namedArgs: {
+                                  "amount": data.individualTotalFocusMinutes !=
+                                          null
+                                      ? data.individualTotalFocusMinutes != 0
+                                          ? 0.22 * data.individualTotalFocusMinutes <
+                                                  100
+                                              ? (0.22 * data.individualTotalFocusMinutes)
+                                                      .toStringAsFixed(1) +
+                                                  "g"
+                                              : (0.22 *
+                                                          data.individualTotalFocusMinutes /
+                                                          1000)
+                                                      .toStringAsFixed(1) +
+                                                  "kg"
+                                          : "0g"
+                                      : "0g"
+                                }),
+                                style: TextStyle(
+                                    fontWeight: FontWeight.bold, fontSize: 13)),
+                            Text("CO3".tr(), style: TextStyle(fontSize: 13)),
+                          ],
+                        )),
+                    Container(
+                        padding: EdgeInsets.only(top: 20, bottom: 5),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            SizedBox(
+                              height: 20,
+                              width: 20,
+                              child: SvgPicture.asset(
+                                  'assets/images/Profilo/Coupon_da_utilizzare.svg'),
                             ),
-                          ),
-                        ],
+                            SizedBox(
+                              width: 10,
+                            ),
+                            Container(
+                                child: Column(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'CouponProfilo'.tr() + ' ',
+                                  style: TextStyle(
+                                      color: new Color(0xFF190E3B),
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.w800),
+                                  textAlign: TextAlign.left,
+                                ),
+                              ],
+                            )),
+                          ],
+                        )),
+                    Container(
+                      height: 10,
+                    ),
+                    Container(
+                        height: 1.5,
+                        width: MediaQuery.of(context).size.width * 0.85,
+                        color: Colors.grey.withOpacity(.2)),
+                    ListView.builder(
+                      physics: const NeverScrollableScrollPhysics(),
+                      scrollDirection: Axis.vertical,
+                      shrinkWrap: true,
+                      itemBuilder: (context, index) =>
+                          buildItem(context, data.redeemedRewards[index]),
+                      itemCount: data.redeemedRewards.length,
+                    ),
+                    SizedBox(height: 10),
+                    Visibility(
+                      visible: data.redeemedRewards.length <
+                                  data.redeemedRewardsQuantity &&
+                              data.redeemedRewardsQuantity != 0
+                          ? true
+                          : false,
+                      child: GestureDetector(
+                        onTap: () =>
+                            Provider.of<TimerNotifier>(context, listen: false)
+                                .loadMoreRewards(),
+                        child: Container(
+                          margin: EdgeInsets.only(bottom: 40),
+                          height: 40,
+                          width: MediaQuery.of(context).size.width * 0.7,
+                          child: Center(
+                              child: Text("Load more...",
+                                  style: TextStyle(color: Colors.white))),
+                          decoration: BoxDecoration(
+                              color: new Color(0xFFFF6926),
+                              borderRadius: BorderRadius.circular(6)),
+                        ),
                       ),
-                      SizedBox(height: 30),
-                    ],
-                  ))),
-        ),
-        /* AnimatedOpacity(
-          opacity: loading ? 1 : 0,
-          duration: Duration(milliseconds: 100),
-          child: Visibility(
-            visible: visible ? true : false,
-            child: ProfileLoading(),
-          ),
-        ), */
-      ],
-    );
+                    ),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        RichText(
+                          textAlign: TextAlign.center,
+                          text: TextSpan(
+                            text: "profile-end-1".tr(),
+                            style: TextStyle(
+                                fontFamily: 'Poppins-Regular',
+                                fontWeight: FontWeight.normal,
+                                fontSize: 10,
+                                color: new Color(0xFF190E3B)),
+                            children: <TextSpan>[
+                              TextSpan(
+                                  text: "profile-end-2".tr(),
+                                  style:
+                                      TextStyle(fontWeight: FontWeight.bold)),
+                              TextSpan(text: "profile-end-3".tr()),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 30),
+                  ],
+                )));
+      })
+    ]);
   }
 
   Widget buildItem(BuildContext context, DocumentSnapshot document) {
@@ -869,8 +565,10 @@ class _Profile extends State<UserProfile> {
                             .doc(uuid)
                             .collection(uuid)
                             .doc(postID)
-                            .update({"visible": false}).then(
-                                (value) => Navigator.of(context).pop());
+                            .update({"visible": false}).then((value) => Provider
+                                    .of<TimerNotifier>(context, listen: false)
+                                .loadRedeemedRewards()
+                                .then((value) => Navigator.of(context).pop()));
                       },
                       text: "delete".tr().toUpperCase(),
                       color: new Color(0xFFFF6926),

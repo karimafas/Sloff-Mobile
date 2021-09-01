@@ -2,9 +2,11 @@ import 'dart:core';
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:provider/provider.dart';
 import 'package:sloff/components/ListFooterGroup.dart';
 import 'package:sloff/components/ListFooterIndividual.dart';
 import 'package:sloff/components/NoChallengeStatusBar.dart';
+import 'package:sloff/components/RectangleButton.dart';
 import 'package:sloff/components/RewardsTitle.dart';
 import 'package:sloff/components/SloffMethods.dart';
 import 'package:sloff/components/SloffModals.dart';
@@ -13,13 +15,10 @@ import 'package:sloff/components/StatusBarIndividual.dart';
 import 'package:sloff/components/Reward.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:sloff/services/provider/TimerNotifier.dart';
 
 class Challenge extends StatefulWidget {
-  const Challenge(
-      {Key key,
-      this.goToProfile,
-      this.uuid,
-      this.company})
+  const Challenge({Key key, this.goToProfile, this.uuid, this.company})
       : super(key: key);
 
   @override
@@ -250,7 +249,10 @@ class _Challenge extends State<Challenge> with SingleTickerProviderStateMixin {
                                                             context,
                                                             rewardsSnapshot.data
                                                                 .docs[index],
-                                                            snapshot.data.docs[0]['groupFocusMinutes'],
+                                                            snapshot.data
+                                                                    .docs[0]
+                                                                [
+                                                                'groupFocusMinutes'],
                                                             snapshot.data
                                                                 .docs[0].id)
                                                         : ListFooterGroup(),
@@ -287,12 +289,11 @@ class _Challenge extends State<Challenge> with SingleTickerProviderStateMixin {
       } else if (document['total_focus'] * 60 <= focusHours) {
         coupon = Coupon(
             redeemCallback: () => SloffModals.unlockIndividualReward(
-                context,
-                couponid,
-                focusHours,
-                document,
-                (aa, bb) => SloffMethods.saveIndividualReward(
-                    couponid, document, widget.goToProfile)),
+                    context, couponid, focusHours, document, (aa, bb) async {
+                  SloffMethods.saveIndividualReward(
+                      couponid, document, widget.goToProfile, context);
+                  
+                }),
             challengeID: challengeID,
             status: 3,
             title: document['title'],

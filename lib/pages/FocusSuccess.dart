@@ -68,7 +68,14 @@ class _FocusSuccessState extends State<FocusSuccess> {
 
         time = query["available"];
       } else {
-        time = await SloffApi.getCompanyGroupFocus(companyID: widget.company);
+        var timeQuery = await FirebaseFirestore.instance
+            .collection('users_company')
+            .doc(widget.company)
+            .collection('challenge')
+            .doc(challenge.docs[0].id)
+            .get();
+
+        time = timeQuery['groupFocusMinutes'];
       }
 
       challengeDetails = {
@@ -112,8 +119,9 @@ class _FocusSuccessState extends State<FocusSuccess> {
                         Column(
                           children: [
                             Text(
-                                "focus-success-1"
-                                    .tr(namedArgs: {"name": widget.name.capitalize()}),
+                                "focus-success-1".tr(namedArgs: {
+                                  "name": widget.name.capitalize()
+                                }),
                                 style: TextStyle(
                                     color: new Color(0xFF190E3B),
                                     fontFamily: 'Poppins-Regular',

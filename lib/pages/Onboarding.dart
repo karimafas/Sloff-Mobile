@@ -13,6 +13,7 @@ import 'package:sloff/components/OnboardingBackground.dart';
 import 'package:sloff/components/RectangleButton.dart';
 import 'package:sloff/pages/HomePage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:sloff/pages/Loader.dart';
 import 'package:sloff/services/provider/TimerNotifier.dart';
 import 'ChangeSocialCause.dart';
 
@@ -284,7 +285,8 @@ class _OnboardingState extends State<Onboarding> {
                                   Navigator.push(
                                       context,
                                       MaterialPageRoute(
-                                          builder: (context) => CambioCausa()));
+                                          builder: (context) =>
+                                              OnboardingReady()));
                                 },
                                 color: new Color(0xFFFF6926),
                                 text: "letsdoit".tr().toUpperCase(),
@@ -429,14 +431,9 @@ class _OnboardingReadyState extends State<OnboardingReady> {
                                   await SharedPreferences.getInstance();
                               pushWithFade(
                                   context,
-                                  ChangeNotifierProvider(
-                                    create: (_) => TimerNotifier(
-                                        prefs.getString("company"),
-                                        prefs.getString("uuid")),
-                                    child: HomePage(
-                                        uuid: prefs.getString("uuid"),
-                                        company: prefs.getString("company")),
-                                  ),
+                                  Loader(
+                                      uuid: prefs.getString("uuid"),
+                                      company: prefs.getString("company")),
                                   500);
                             },
                             text: "explore".tr().toUpperCase(),

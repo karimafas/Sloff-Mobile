@@ -370,9 +370,7 @@ class _SloffTimerState extends State<SloffTimer> with WidgetsBindingObserver {
     finalRanking = await SloffApi.findRanking(uuid: uuid, token: token);
 
     await Provider.of<TimerNotifier>(context, listen: false)
-        .getIndividualFocus(token);
-    Provider.of<TimerNotifier>(context, listen: false)
-        .setRanking(int.parse(initialRanking), int.parse(finalRanking));
+        .getIndividualFocus();
 
     // If there is a group challenge, update the document containing group focus
     var groupChallenge =
@@ -386,14 +384,13 @@ class _SloffTimerState extends State<SloffTimer> with WidgetsBindingObserver {
           .where("visible", isEqualTo: true)
           .get();
 
-        FirebaseFirestore.instance
-            .collection('users_company')
-            .doc(widget.company)
-            .collection('challenge')
-            .doc(challenge.docs[0].reference.id)
-            .set({
-          "groupFocusMinutes": FieldValue.increment(minutes)
-        }, SetOptions(merge: true));
+      FirebaseFirestore.instance
+          .collection('users_company')
+          .doc(widget.company)
+          .collection('challenge')
+          .doc(challenge.docs[0].reference.id)
+          .set({"groupFocusMinutes": FieldValue.increment(minutes)},
+              SetOptions(merge: true));
     }
   }
 
@@ -631,7 +628,7 @@ class _SloffTimerState extends State<SloffTimer> with WidgetsBindingObserver {
                       child: Stack(
                     alignment: Alignment.center,
                     children: [
-                      _riveArtboard != null
+                      /* _riveArtboard != null
                           ? Container(
                               height: MediaQuery.of(context).size.width * 0.55,
                               width: MediaQuery.of(context).size.width * 0.55,
@@ -639,7 +636,14 @@ class _SloffTimerState extends State<SloffTimer> with WidgetsBindingObserver {
                                 artboard: _riveArtboard,
                               ),
                             )
-                          : Container(),
+                          : Container(), */
+                      Container(
+                        height: MediaQuery.of(context).size.width * 0.5,
+                        width: MediaQuery.of(context).size.width * 0.5,
+                        decoration: BoxDecoration(
+                            color: new Color(0xFF190E3B),
+                            borderRadius: BorderRadius.circular(100)),
+                      ),
                       Container(
                         key: forceRebuild,
                         child: IgnorePointer(

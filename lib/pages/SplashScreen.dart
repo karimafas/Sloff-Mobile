@@ -10,6 +10,7 @@ import 'package:sloff/components/FadeNavigation.dart';
 import 'package:sloff/pages/FocusSuccess.dart';
 import 'package:sloff/pages/HomePage.dart';
 import 'package:sloff/pages/EmojiSurvey.dart';
+import 'package:sloff/pages/Loader.dart';
 import 'package:sloff/pages/RegularSurvey.dart';
 import 'package:sloff/pages/SloffTeamSurvey.dart';
 import 'package:sloff/pages/PreLogin.dart';
@@ -181,7 +182,7 @@ class _SplashScreenState extends State<SplashScreen> {
                     future: checkSurvey,
                     builder: (context, snapshot) {
                       if (!snapshot.hasData) {
-                        return HomePage(
+                        return Loader(
                             uuid: widget.uuid, company: widget.company);
                       }
                       if (snapshot.hasError) {
@@ -209,7 +210,7 @@ class _SplashScreenState extends State<SplashScreen> {
                                     name: name);
                           }
                         } else {
-                          return HomePage(
+                          return Loader(
                               uuid: widget.uuid, company: widget.company);
                         }
                       }

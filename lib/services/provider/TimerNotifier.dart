@@ -1,46 +1,86 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class TimerNotifier extends ChangeNotifier {
-  final String company;
-  final String uuid;
+  String company;
+  String uuid;
 
-  TimerNotifier(this.company, this.uuid);
+  void setUserCompany({@required u, @required c}) {
+    company = c;
+    uuid = u;
+  }
 
-  // INTERFACE
-  int rankingProgression =
-      -1; // -1 = loading, 0 = stable, 1 = descending, 2 = ascending
+  Future<void> initialise() async {
+    await loadUserData();
+    await getIndividualFocus();
+    await loadRedeemedRewards();
+    await getRedeemedRewardsQuantity();
+  }
 
-  void setRanking(int initialRanking, int finalRanking) {
-    Future.delayed(Duration(seconds: 2));
+  // User Data
+  String first_name;
+  String last_name;
+  String profile_picture;
+  DateTime userCreationDt;
+  int loadedRewards = 5;
+  var redeemedRewards;
+  int redeemedRewardsQuantity = 0;
 
-    if (initialRanking > finalRanking) {
-      rankingProgression = 1;
-    } else if (initialRanking < finalRanking) {
-      rankingProgression = 2;
-    } else if (initialRanking == finalRanking) {
-      rankingProgression = 0;
-    }
+  Future<void> loadUserData() async {
+    var user =
+        await FirebaseFirestore.instance.collection('users').doc(uuid).get();
+
+    first_name = user['name'];
+    last_name = user['surname'];
+    profile_picture = user['profile_picture'];
+    userCreationDt = DateTime.fromMillisecondsSinceEpoch(user['created_date']);
 
     notifyListeners();
   }
 
-  void resetRanking() {
-    rankingProgression = -1;
+  void loadMoreRewards() {
+    loadedRewards += 5;
+
+    loadRedeemedRewards();
+  }
+
+  Future<void> getRedeemedRewardsQuantity() async {
+    var query1 = await FirebaseFirestore.instance
+        .collection('users_coupon')
+        .doc(uuid)
+        .collection(uuid)
+        .get();
+
+    redeemedRewardsQuantity = query1.docs.length;
+
+    print("total rewards $redeemedRewardsQuantity");
+  }
+
+  Future<void> loadRedeemedRewards() async {
+    var query = await FirebaseFirestore.instance
+        .collection('users_coupon')
+        .doc(uuid)
+        .collection(uuid)
+        .orderBy('redeemed_at', descending: true)
+        .limit(loadedRewards)
+        .get();
+
+    redeemedRewards = query.docs;
 
     notifyListeners();
   }
 
-  // INDIVIDUAL FOCUS
-  int individualFocusMinutes = 0;
+  // Focus
+  int individualAvailableFocusMinutes = 0;
+  int individualTotalFocusMinutes = 0;
 
-  Future<void> getIndividualFocus(token) async {
-    //var minutes = jsonDecode(await SloffApi.getFocus(uuid, token))['available'];
-
+  Future<void> getIndividualFocus() async {
     var minutes =
         await FirebaseFirestore.instance.collection("focus").doc(uuid).get();
 
-    individualFocusMinutes = minutes['available'];
+    individualAvailableFocusMinutes = minutes['available'];
+    individualTotalFocusMinutes = minutes['total'];
 
     notifyListeners();
   }

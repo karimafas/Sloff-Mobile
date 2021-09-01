@@ -14,7 +14,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:sloff/services/provider/TimerNotifier.dart';
-import 'components/SplashScreen.dart';
+import 'pages/SplashScreen.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -134,7 +134,7 @@ class _MyApp extends State<MyApp> {
             FirebaseAuth.instance.signInAnonymously();
 
             return ChangeNotifierProvider(
-              create: (_) => TimerNotifier(details['company'], details['uuid']),
+              create: (_) => TimerNotifier(),
               child: MaterialApp(
                 title: 'Sloff',
                 localizationsDelegates: context.localizationDelegates,

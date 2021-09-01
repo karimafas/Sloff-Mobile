@@ -7,6 +7,7 @@ import 'package:sloff/components/Background.dart';
 import 'package:sloff/components/FadeNavigation.dart';
 import 'package:sloff/components/RectangleButton.dart';
 import 'package:sloff/pages/HomePage.dart';
+import 'package:sloff/pages/Loader.dart';
 
 class EmojiSurvey extends StatelessWidget {
   const EmojiSurvey({Key key, this.company, this.uuid, this.name, this.surveyId})
@@ -30,7 +31,7 @@ class EmojiSurvey extends StatelessWidget {
       "last_answer": DateFormat("dd-MM-yyy").format(DateTime.now())
     });
 
-    pushReplacementWithFade(context, HomePage(uuid: uuid, company: company), 500);
+    pushReplacementWithFade(context, Loader(uuid: uuid, company: company), 500);
   }
 
   @override

@@ -57,8 +57,8 @@ class RewardsTitle extends StatelessWidget {
                                     builder: (context, data, index) {
                                       return Text(
                                           !hours
-                                              ? data.individualFocusMinutes.toString() + " min"
-                                              : (data.individualFocusMinutes / 60).round().toString() + " h",
+                                              ? data.individualAvailableFocusMinutes.toString() + " min"
+                                              : (data.individualAvailableFocusMinutes / 60).round().toString() + " h",
                                           style: TextStyle(
                                               color: Colors.white,
                                               fontSize: 12,
