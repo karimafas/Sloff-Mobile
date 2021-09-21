@@ -131,8 +131,6 @@ class _MyApp extends State<MyApp> {
             return Container();
           }
           if (snapshot.connectionState == ConnectionState.done) {
-            FirebaseAuth.instance.signInAnonymously();
-
             return ChangeNotifierProvider(
               create: (_) => TimerNotifier(),
               child: MaterialApp(

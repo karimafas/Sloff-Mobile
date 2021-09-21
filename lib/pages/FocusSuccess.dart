@@ -3,11 +3,13 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:provider/provider.dart';
 import 'package:sloff/components/Animations.dart';
 import 'package:sloff/components/RectangleButton.dart';
 import 'package:sloff/components/Reward.dart';
 import 'package:sloff/services/SloffApi.dart';
 import 'package:sloff/components/SloffModals.dart';
+import 'package:sloff/services/provider/TimerNotifier.dart';
 
 class FocusSuccess extends StatefulWidget {
   const FocusSuccess(
@@ -200,28 +202,34 @@ class _FocusSuccessState extends State<FocusSuccess> {
                                           fontFamily: 'Poppins-Regular',
                                           fontWeight: FontWeight.bold,
                                           fontSize: 17)),
-                                  Row(
-                                    children: [
-                                      Text(widget.finalRanking.toString() + "°",
-                                          style: TextStyle(
-                                              color: new Color(0xFFFF4E4E),
-                                              fontFamily: 'Poppins-Regular',
-                                              fontWeight: FontWeight.bold,
-                                              fontSize: 17)),
-                                      Container(
-                                        width: 5,
-                                      ),
-                                      Icon(
-                                          widget.initialRanking <
-                                                  widget.finalRanking
-                                              ? Icons.arrow_drop_down_rounded
-                                              : widget.initialRanking ==
-                                                      widget.finalRanking
-                                                  ? Icons.remove
-                                                  : Icons.arrow_drop_up_rounded,
-                                          color: new Color(0xFF694EFF))
-                                    ],
-                                  ),
+                                  Consumer<TimerNotifier>(
+                                      builder: (context, data, index) {
+                                    return Row(
+                                      children: [
+                                        Text(
+                                            widget.finalRanking.toString() +
+                                                "°",
+                                            style: TextStyle(
+                                                color: new Color(0xFFFF4E4E),
+                                                fontFamily: 'Poppins-Regular',
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 17)),
+                                        Container(
+                                          width: 5,
+                                        ),
+                                        Icon(
+                                            data.initialRanking <
+                                                    data.finalRanking
+                                                ? Icons.arrow_drop_down_rounded
+                                                : data.initialRanking ==
+                                                        data.finalRanking
+                                                    ? Icons.remove
+                                                    : Icons
+                                                        .arrow_drop_up_rounded,
+                                            color: new Color(0xFF694EFF)),
+                                      ],
+                                    );
+                                  }),
                                 ],
                               ),
                             ),

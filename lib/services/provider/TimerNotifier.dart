@@ -1,6 +1,9 @@
+import 'dart:convert';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:sloff/services/SloffApi.dart';
 
 class TimerNotifier extends ChangeNotifier {
   String company;
@@ -26,6 +29,8 @@ class TimerNotifier extends ChangeNotifier {
   int loadedRewards = 5;
   var redeemedRewards;
   int redeemedRewardsQuantity = 0;
+  int initialRanking;
+  int finalRanking;
 
   Future<void> loadUserData() async {
     var user =
@@ -43,6 +48,22 @@ class TimerNotifier extends ChangeNotifier {
     loadedRewards += 5;
 
     loadRedeemedRewards();
+  }
+
+  Future<void> getInitialRanking(String uuid) async {
+    var token = await FirebaseAuth.instance.currentUser.getIdToken();
+
+    initialRanking = jsonDecode(await SloffApi.findRanking(uuid: uuid, token: token));
+
+    notifyListeners();
+  }
+
+  Future<void> getFinalRanking(String uuid) async {
+    var token = await FirebaseAuth.instance.currentUser.getIdToken();
+
+    finalRanking = jsonDecode(await SloffApi.findRanking(uuid: uuid, token: token));
+
+    notifyListeners();
   }
 
   Future<void> getRedeemedRewardsQuantity() async {

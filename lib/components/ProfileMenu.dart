@@ -191,12 +191,6 @@ class DrawerUiWidget extends StatelessWidget {
                                   FirebaseMessaging.instance
                                       .unsubscribeFromTopic(company);
 
-                                  FirebaseAuth.instance
-                                      .signInAnonymously()
-                                      .then((value) {
-                                    print("signed in anonymously");
-                                  });
-
                                   pushReplacementWithFade(
                                       context, PreLogin(), 500);
                                 },

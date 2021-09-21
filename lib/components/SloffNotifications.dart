@@ -1,4 +1,7 @@
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:timezone/data/latest.dart' as tz;
+import 'package:timezone/timezone.dart' as tz;
+import 'package:flutter_native_timezone/flutter_native_timezone.dart';
 
 extension StringExtension on String {
   String capitalize() {
@@ -29,13 +32,16 @@ class SloffNotifications {
         iOS: iOSPlatformChannelSpecifics);
     await flutterLocalNotificationsPlugin.show(
         0,
-        timeSeconds > 60 ? "Enjoy your $time minutes off the screen!" : "Enjoy your $time seconds off the screen!",
+        timeSeconds > 60
+            ? "Enjoy your $time minutes off the screen!"
+            : "Enjoy your $time seconds off the screen!",
         "Remember not to use apps, or your focus will be lost. Unlock the screen at any time to see how long you've got left!",
         platformChannelSpecifics,
         payload: 'item x');
   }
 
-    static warningNotification(FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin) async {
+  static warningNotification(
+      FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin) async {
     const AndroidNotificationDetails androidPlatformChannelSpecifics =
         AndroidNotificationDetails(
             'your channel id', 'Sloff', 'your channel description',
@@ -52,17 +58,15 @@ class SloffNotifications {
     const NotificationDetails platformChannelSpecifics = NotificationDetails(
         android: androidPlatformChannelSpecifics,
         iOS: iOSPlatformChannelSpecifics);
-    await flutterLocalNotificationsPlugin.show(
-        0,
-        "I see you! 👀",
-        "Return to Sloff, or you'll lose your focus.",
-        platformChannelSpecifics,
+    await flutterLocalNotificationsPlugin.show(0, "I see you! 👀",
+        "Return to Sloff, or you'll lose your focus.", platformChannelSpecifics,
         payload: 'item x');
   }
 }
 
 class SloffScheduledNotifications {
-  static Future warningNotification(DateTime time, FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin) async {
+  static Future warningNotification(DateTime time,
+      FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin) async {
     const AndroidNotificationDetails androidPlatformChannelSpecifics =
         AndroidNotificationDetails(
             'your channel id', 'Sloff', 'your channel description',
@@ -88,7 +92,8 @@ class SloffScheduledNotifications {
         payload: 'item x');
   }
 
-  static Future lostFocusNotification(DateTime time, FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin) async {
+  static Future lostFocusNotification(DateTime time,
+      FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin) async {
     const AndroidNotificationDetails androidPlatformChannelSpecifics =
         AndroidNotificationDetails(
             'your channel id', 'Sloff', 'your channel description',
@@ -114,7 +119,8 @@ class SloffScheduledNotifications {
         payload: 'item x');
   }
 
-    static Future focusCompletedNotification(DateTime time, String name, FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin) async {
+  /* static Future focusCompletedNotification(DateTime time, String name,
+      FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin) async {
     const AndroidNotificationDetails androidPlatformChannelSpecifics =
         AndroidNotificationDetails(
             'your channel id', 'Sloff', 'your channel description',
@@ -128,6 +134,7 @@ class SloffScheduledNotifications {
       presentBadge: true,
       presentSound: true,
     );
+
     const NotificationDetails platformChannelSpecifics = NotificationDetails(
         android: androidPlatformChannelSpecifics,
         iOS: iOSPlatformChannelSpecifics);
@@ -138,5 +145,45 @@ class SloffScheduledNotifications {
         time,
         platformChannelSpecifics,
         payload: 'item x');
+
+    print("SCHEDULE FOCUS COMPLETED");
+  } */
+
+  static Future focusCompletedNotification(final seconds, String name,
+      FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin) async {
+    tz.initializeTimeZones();
+    tz.setLocalLocation(
+        tz.getLocation(await FlutterNativeTimezone.getLocalTimezone()));
+
+    const AndroidNotificationDetails androidPlatformChannelSpecifics =
+        AndroidNotificationDetails(
+            'your channel id', 'Sloff', 'your channel description',
+            importance: Importance.max,
+            priority: Priority.high,
+            showWhen: false,
+            ongoing: true,
+            styleInformation: BigTextStyleInformation(''));
+    const iOSPlatformChannelSpecifics = IOSNotificationDetails(
+      presentAlert: true,
+      presentBadge: true,
+      presentSound: true,
+    );
+
+    const NotificationDetails platformChannelSpecifics = NotificationDetails(
+        android: androidPlatformChannelSpecifics,
+        iOS: iOSPlatformChannelSpecifics);
+
+    await flutterLocalNotificationsPlugin.zonedSchedule(
+        1,
+        "Congrats " + name.capitalize() + "! 🎉",
+        "You have completed your focus.",
+        tz.TZDateTime.now(tz.local).add(Duration(seconds: seconds)),
+        platformChannelSpecifics,
+        androidAllowWhileIdle: true,
+        uiLocalNotificationDateInterpretation:
+            UILocalNotificationDateInterpretation.absoluteTime,
+        payload: 'item x');
+
+    print("notification will trigger in $seconds seconds");
   }
 }

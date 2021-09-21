@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:convert';
 import 'dart:io';
 import 'dart:ui';
 import 'package:android_alarm_manager_plus/android_alarm_manager_plus.dart';
@@ -11,6 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_circular_slider/flutter_circular_slider.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:is_lock_screen/is_lock_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:rive/rive.dart';
@@ -38,7 +38,8 @@ class SloffTimer extends StatefulWidget {
   final String company;
 }
 
-class _SloffTimerState extends State<SloffTimer> with WidgetsBindingObserver {
+class _SloffTimerState extends State<SloffTimer>
+    with WidgetsBindingObserver, SingleTickerProviderStateMixin {
   Timer timer;
   Timer nativeTimer;
   bool cancelNativeTimer = false;
@@ -73,6 +74,7 @@ class _SloffTimerState extends State<SloffTimer> with WidgetsBindingObserver {
   ValueKey<DateTime> forceRebuild;
   var initialRanking;
   var finalRanking;
+  AnimationController _controller;
 
   void _updateLabels(int init, int end, int laps) {
     if (_currentIndex != 1) {
@@ -200,6 +202,8 @@ class _SloffTimerState extends State<SloffTimer> with WidgetsBindingObserver {
         stop(false, true);
         prefs.setBool("timeRecorded", true);
       }
+
+      print("SECONDSTOEND $secondsToEnd");
     });
 
     // Start native parallel timers
@@ -223,11 +227,10 @@ class _SloffTimerState extends State<SloffTimer> with WidgetsBindingObserver {
           if (Platform.isIOS) sendSwiftNotification();
         }
 
-        if (isRunning && await isLockScreen()) {
+        if (isRunning && await isLockScreen() && !completedNotificationSent) {
+          print("Scheduling for $secondsToEnd");
           SloffScheduledNotifications.focusCompletedNotification(
-              DateTime.now().add(Duration(seconds: secondsToEnd)),
-              name,
-              flutterLocalNotificationsPlugin);
+              secondsToEnd, name, flutterLocalNotificationsPlugin);
           completedNotificationSent = true;
         }
       }
@@ -235,6 +238,8 @@ class _SloffTimerState extends State<SloffTimer> with WidgetsBindingObserver {
   }
 
   stop(bool userInitiated, bool successful) {
+    setExitedTime = false;
+
     if (_currentIndex != 0) {
       _currentIndex = 0;
       _pageController.animateToPage(0,
@@ -254,12 +259,12 @@ class _SloffTimerState extends State<SloffTimer> with WidgetsBindingObserver {
                     company: widget.company,
                     uuid: widget.uuid,
                     minutes: minutesToWrite,
-                    initialRanking: int.parse(initialRanking),
-                    finalRanking: int.parse(finalRanking),
+                    initialRanking:
+                        initialRanking != null ? int.parse(initialRanking) : 0,
+                    finalRanking:
+                        finalRanking != null ? int.parse(finalRanking) : 0,
                     name: name),
                 500);
-            /* SloffModals.focusCompleted(context, minutesToWrite, name,
-                widget.goToRewards, widget.company); */
           }
         });
       }
@@ -306,6 +311,7 @@ class _SloffTimerState extends State<SloffTimer> with WidgetsBindingObserver {
     var token = await FirebaseAuth.instance.currentUser.getIdToken();
 
     initialRanking = await SloffApi.findRanking(uuid: uuid, token: token);
+    Provider.of<TimerNotifier>(context, listen: false).getInitialRanking(uuid);
 
     // Update the user focus
     FirebaseFirestore.instance.collection("focus").doc(uuid).update({
@@ -368,6 +374,7 @@ class _SloffTimerState extends State<SloffTimer> with WidgetsBindingObserver {
     await SloffApi.increaseFocus(uuid, minutes, token);
 
     finalRanking = await SloffApi.findRanking(uuid: uuid, token: token);
+    Provider.of<TimerNotifier>(context, listen: false).getFinalRanking(uuid);
 
     await Provider.of<TimerNotifier>(context, listen: false)
         .getIndividualFocus();
@@ -430,6 +437,7 @@ class _SloffTimerState extends State<SloffTimer> with WidgetsBindingObserver {
 
       // Cancel any scheduled notifications
       if (Platform.isAndroid) AndroidAlarmManager.cancel(0);
+      await flutterLocalNotificationsPlugin.cancel(0);
       await flutterLocalNotificationsPlugin.cancel(1);
       await flutterLocalNotificationsPlugin.cancel(2);
       await flutterLocalNotificationsPlugin.cancel(3);
@@ -488,8 +496,11 @@ class _SloffTimerState extends State<SloffTimer> with WidgetsBindingObserver {
             stop(false, false);
 
             nativeTimer.cancel();
+            prefs.setInt("androidStopTime", 0);
+            tAndroidStopTime = 0;
           } else {
             prefs.setInt("androidStopTime", 0);
+            tAndroidStopTime = 0;
           }
         }
       }
@@ -506,6 +517,13 @@ class _SloffTimerState extends State<SloffTimer> with WidgetsBindingObserver {
       appState = "PAUSED";
       print('AppLifecycleState state: Paused');
 
+      if (!setExitedTime && isRunning) {
+        exitedTime = DateTime.now();
+        print("EXITEDTIME $exitedTime");
+        exitedSeconds = secondsToEnd;
+        setExitedTime = true;
+      }
+
       outsideApp = true;
     }
 
@@ -515,10 +533,9 @@ class _SloffTimerState extends State<SloffTimer> with WidgetsBindingObserver {
       print('AppLifecycleState state: Inactive');
 
       if (isRunning) {
+        print("Scheduling for $secondsToEnd");
         SloffScheduledNotifications.focusCompletedNotification(
-            DateTime.now().add(Duration(seconds: secondsToEnd)),
-            name,
-            flutterLocalNotificationsPlugin);
+            secondsToEnd, name, flutterLocalNotificationsPlugin);
         completedNotificationSent = true;
 
         if (Platform.isAndroid) {
@@ -537,7 +554,7 @@ class _SloffTimerState extends State<SloffTimer> with WidgetsBindingObserver {
           }
         }
 
-        if (!setExitedTime) {
+        if (!setExitedTime && isRunning) {
           exitedTime = DateTime.now();
           print("EXITEDTIME $exitedTime");
           exitedSeconds = secondsToEnd;
@@ -545,8 +562,10 @@ class _SloffTimerState extends State<SloffTimer> with WidgetsBindingObserver {
         }
       }
 
-      setState(() async {
-        if (await isLockScreen()) {
+      var lockscreen = await isLockScreen();
+
+      setState(() {
+        if (lockscreen) {
           outsideApp = true;
         } else {
           outsideApp = true;
@@ -577,12 +596,21 @@ class _SloffTimerState extends State<SloffTimer> with WidgetsBindingObserver {
       },
     );
 
+    _controller = AnimationController(
+      duration: const Duration(seconds: 15),
+      vsync: this,
+    );
+
+    _controller.repeat();
+
     fetchInfo();
   }
 
   @override
   void dispose() {
     super.dispose();
+
+    _controller.dispose();
 
     WidgetsBinding.instance.removeObserver(this);
 
@@ -637,12 +665,16 @@ class _SloffTimerState extends State<SloffTimer> with WidgetsBindingObserver {
                               ),
                             )
                           : Container(), */
-                      Container(
-                        height: MediaQuery.of(context).size.width * 0.5,
-                        width: MediaQuery.of(context).size.width * 0.5,
-                        decoration: BoxDecoration(
-                            color: new Color(0xFF190E3B),
-                            borderRadius: BorderRadius.circular(100)),
+                      RotationTransition(
+                        turns: Tween(begin: 0.0, end: 1.0).animate(_controller),
+                        child: SizedBox(
+                          height: MediaQuery.of(context).size.width * 0.5,
+                          width: MediaQuery.of(context).size.width * 0.5,
+                          /* decoration: BoxDecoration(
+                              color: new Color(0xFF190E3B),
+                              borderRadius: BorderRadius.circular(100)), */
+                          child: Image.asset('assets/images/Home/bubble.png'),
+                        ),
                       ),
                       Container(
                         key: forceRebuild,

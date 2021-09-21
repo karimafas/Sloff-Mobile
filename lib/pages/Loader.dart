@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
@@ -15,8 +16,11 @@ import 'package:sloff/services/provider/TimerNotifier.dart';
 List loadingPhrases = [
   "Squeezing focus...",
   "Fixing timers...",
-  "Calculating minutes...",
-  "Predicting rewards..."
+  "Swapping seconds for minutes...",
+  "Requesting rewards...",
+  "Pointing loose hands...",
+  "Randomising odds...",
+  "Tuning bells..."
 ];
 
 class Loader extends StatefulWidget {
@@ -30,8 +34,12 @@ class Loader extends StatefulWidget {
 }
 
 class _LoaderState extends State<Loader> {
+  int loadingIndex = 0;
+  Timer timer;
+
   Future<void> initialisation() async {
-    Provider.of<TimerNotifier>(context, listen: false).setUserCompany(u: widget.uuid, c: widget.company);
+    Provider.of<TimerNotifier>(context, listen: false)
+        .setUserCompany(u: widget.uuid, c: widget.company);
 
     var token = await FirebaseAuth.instance.currentUser.getIdToken();
 
@@ -130,6 +138,14 @@ class _LoaderState extends State<Loader> {
   void initState() {
     super.initState();
 
+    loadingIndex = new Random().nextInt(loadingPhrases.length);
+
+    timer = new Timer.periodic(Duration(seconds: 1), (timer) {
+      setState(() {
+        loadingIndex = new Random().nextInt(loadingPhrases.length);
+      });
+    });
+
     initialisation();
   }
 
@@ -137,6 +153,7 @@ class _LoaderState extends State<Loader> {
   void dispose() {
     // TODO: implement dispose
     super.dispose();
+    timer.cancel();
   }
 
   @override
@@ -151,7 +168,7 @@ class _LoaderState extends State<Loader> {
             size: 50.0,
           ),
           Container(height: 50),
-          Text(loadingPhrases[new Random().nextInt(4)],
+          Text(loadingPhrases[loadingIndex],
               style: TextStyle(
                   color: new Color(0xFF190E3B),
                   fontSize: 11,
