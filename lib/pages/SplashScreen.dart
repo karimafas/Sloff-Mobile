@@ -4,14 +4,17 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:provider/provider.dart';
 import 'package:sloff/components/Animations.dart';
 import 'package:sloff/components/FadeNavigation.dart';
 import 'package:sloff/pages/FocusSuccess.dart';
 import 'package:sloff/pages/HomePage.dart';
 import 'package:sloff/pages/EmojiSurvey.dart';
+import 'package:sloff/pages/Loader.dart';
 import 'package:sloff/pages/RegularSurvey.dart';
 import 'package:sloff/pages/SloffTeamSurvey.dart';
 import 'package:sloff/pages/PreLogin.dart';
+import 'package:sloff/services/provider/TimerNotifier.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({
@@ -179,9 +182,8 @@ class _SplashScreenState extends State<SplashScreen> {
                     future: checkSurvey,
                     builder: (context, snapshot) {
                       if (!snapshot.hasData) {
-                        return HomePage(
-                            uuid: widget.uuid,
-                            company: widget.company);
+                        return Loader(
+                            uuid: widget.uuid, company: widget.company);
                       }
                       if (snapshot.hasError) {
                         return Container(color: Colors.red);
@@ -208,7 +210,7 @@ class _SplashScreenState extends State<SplashScreen> {
                                     name: name);
                           }
                         } else {
-                          return HomePage(
+                          return Loader(
                               uuid: widget.uuid, company: widget.company);
                         }
                       }

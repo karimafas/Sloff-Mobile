@@ -1,8 +1,13 @@
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_functions/cloud_functions.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:sloff/services/SloffApi.dart';
+import 'package:sloff/services/provider/TimerNotifier.dart';
 
 class SloffMethods {
   static Future<void> sendNotification(
@@ -144,8 +149,8 @@ class SloffMethods {
     return null;
   }
 
-  static saveIndividualReward(
-      String rewardId, DocumentSnapshot document, Function goToProfile) async {
+  static saveIndividualReward(String rewardId, DocumentSnapshot document,
+      Function goToProfile, BuildContext context) async {
     int available;
     bool isGroup = false;
 
@@ -226,8 +231,15 @@ class SloffMethods {
                       .doc()
                       .set(rewardToWrite);
                 }
+
+                var token =
+                    await FirebaseAuth.instance.currentUser.getIdToken();
+                SloffApi.subtractFocus(
+                    uuid, rewardToWrite['total_focus'] * 60, token);
               }).then((value) {
-                goToProfile();
+                Provider.of<TimerNotifier>(context, listen: false)
+                    .loadRedeemedRewards()
+                    .then((value) => goToProfile());
               });
             });
           }
@@ -267,8 +279,6 @@ class SloffMethods {
         .collection('users')
         .get();
     var users = usersList.docs;
-
-    print("USERSSSS $users");
 
     final query = await FirebaseFirestore.instance
         .collection("users_company")

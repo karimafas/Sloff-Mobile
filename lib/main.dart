@@ -9,10 +9,12 @@ import 'package:flutter/rendering.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'components/SplashScreen.dart';
+import 'package:sloff/services/provider/TimerNotifier.dart';
+import 'pages/SplashScreen.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -87,8 +89,8 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyApp extends State<MyApp> {
-  final Future<FirebaseApp> _initialization = Firebase.initializeApp();
-  Future getData;
+  Future initialisation;
+  Map details;
 
   Future<Map> getUserCompany() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -101,12 +103,18 @@ class _MyApp extends State<MyApp> {
     return details;
   }
 
+  Future<void> initialise() async {
+    await Firebase.initializeApp();
+
+    details = await getUserCompany();
+  }
+
   void initState() {
     super.initState();
 
     WidgetsFlutterBinding.ensureInitialized();
-    Firebase.initializeApp();
-    getData = getUserCompany();
+
+    initialisation = initialise();
   }
 
   @override
@@ -117,48 +125,44 @@ class _MyApp extends State<MyApp> {
     FirebaseAnalytics analytics = FirebaseAnalytics();
 
     return FutureBuilder<Object>(
-        future: _initialization,
+        future: initialisation,
         builder: (context, snapshot) {
           if (snapshot.hasError) {
             return Container();
           }
           if (snapshot.connectionState == ConnectionState.done) {
-            FirebaseAuth.instance.signInAnonymously().then((value) {
-              print("signed in anonymously");
-            });
-
-            return MaterialApp(
-              title: 'Sloff',
-              localizationsDelegates: context.localizationDelegates,
-              supportedLocales: context.supportedLocales,
-              locale: context.locale,
-              debugShowCheckedModeBanner: false,
-              theme: ThemeData(
-                fontFamily: 'Poppins-Light',
-                primarySwatch: Colors.blue,
-                brightness: Brightness.light,
-                visualDensity: VisualDensity.adaptivePlatformDensity,
-              ),
-              home: MediaQuery(
-                data: new MediaQueryData(),
-                child: FutureBuilder(
-                    future: getData,
-                    builder: (context, userDetails) {
-                      if (!userDetails.hasData) {
-                        return Container();
-                      } else if (userDetails.hasError) {
-                        return Container();
-                      } else {
-                        return MaterialApp(
-                            debugShowCheckedModeBanner: false,
-                            builder: (context, snapshot) {
-                              return SplashScreen(
-                                  uuid: userDetails.data["uuid"],
-                                  company: userDetails.data["company"],
-                                  analytics: analytics);
-                            });
-                      }
-                    }),
+            return ChangeNotifierProvider(
+              create: (_) => TimerNotifier(),
+              child: MaterialApp(
+                title: 'Sloff',
+                localizationsDelegates: context.localizationDelegates,
+                supportedLocales: context.supportedLocales,
+                locale: context.locale,
+                debugShowCheckedModeBanner: false,
+                theme: ThemeData(
+                  backgroundColor: new Color(0xFFFFF8ED),
+                  fontFamily: 'Poppins-Light',
+                  primarySwatch: Colors.blue,
+                  brightness: Brightness.light,
+                  visualDensity: VisualDensity.adaptivePlatformDensity,
+                ),
+                home: MediaQuery(
+                    data: new MediaQueryData(),
+                    child: MaterialApp(
+                        debugShowCheckedModeBanner: false,
+                        theme: ThemeData(
+                          backgroundColor: new Color(0xFFFFF8ED),
+                          fontFamily: 'Poppins-Light',
+                          primarySwatch: Colors.blue,
+                          brightness: Brightness.light,
+                          visualDensity: VisualDensity.adaptivePlatformDensity,
+                        ),
+                        builder: (context, snapshot) {
+                          return SplashScreen(
+                              uuid: details["uuid"],
+                              company: details["company"],
+                              analytics: analytics);
+                        })),
               ),
             );
           } else {

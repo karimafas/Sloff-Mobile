@@ -3,11 +3,14 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:provider/provider.dart';
 import 'package:sloff/components/AnimatedTextBox.dart';
 import 'package:sloff/components/Animations.dart';
 import 'package:sloff/components/FadeNavigation.dart';
+import 'package:sloff/pages/Loader.dart';
 import 'package:sloff/pages/SignUp.dart';
 import 'package:sloff/pages/HomePage.dart';
+import 'package:sloff/services/provider/TimerNotifier.dart';
 import 'package:toast/toast.dart';
 import 'package:flutter/rendering.dart';
 import 'package:sloff/components/RectangleButton.dart';
@@ -132,7 +135,7 @@ class _Login extends State<Login> with SingleTickerProviderStateMixin {
 
                       pushReplacementWithFade(
                           context,
-                          HomePage(
+                          Loader(
                               uuid: prefs.getString("uuid"),
                               company: prefs.getString("company")),
                           500);

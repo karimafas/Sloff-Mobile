@@ -43,11 +43,11 @@ class SloffApi {
         'Content-Type': 'application/json; charset=UTF-8',
         "Authorization": "Bearer " + token
       },
-      body: jsonEncode({'uuid': uuid, 'available': minutes}),
+      body: jsonEncode({'uuid': uuid, 'available': minutes, 'total': minutes}),
     );
   }
 
-  static Future updateFocus(String uuid, int minutes, String token) async {
+  static Future increaseFocus(String uuid, int minutes, String token) async {
     var user = await getFocus(uuid, token);
     int currentMinutes = jsonDecode(user)['available'];
 
@@ -57,8 +57,42 @@ class SloffApi {
         'Content-Type': 'application/json; charset=UTF-8',
         "Authorization": "Bearer " + token
       },
-      body: jsonEncode({'available': currentMinutes + minutes}),
+      body: jsonEncode({
+        'available': currentMinutes + minutes,
+        'total': currentMinutes + minutes
+      }),
     );
+  }
+
+  static Future subtractFocus(String uuid, int minutes, String token) async {
+    var user = await getFocus(uuid, token);
+    int currentMinutes = jsonDecode(user)['available'];
+
+    return http.put(
+      Uri.parse(baseUrl + '/focus/' + uuid),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+        "Authorization": "Bearer " + token
+      },
+      body: jsonEncode({'available': currentMinutes - minutes}),
+    );
+  }
+
+  static Future findRanking(
+      {@required String uuid, @required String token}) async {
+    final response = await http.get(
+        Uri.parse(baseUrl + '/focus/user-ranking/' + uuid),
+        headers: {"Authorization": "Bearer " + token});
+
+    if (response.body.isEmpty) {
+      return "NULL";
+    } else {
+      if (response.statusCode == 200) {
+        return response.body;
+      } else {
+        throw Exception('Failed to load data from the server.');
+      }
+    }
   }
 
   // SLOFF USERS

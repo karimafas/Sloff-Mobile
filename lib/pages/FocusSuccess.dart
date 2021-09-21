@@ -3,19 +3,31 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:provider/provider.dart';
 import 'package:sloff/components/Animations.dart';
 import 'package:sloff/components/RectangleButton.dart';
 import 'package:sloff/components/Reward.dart';
 import 'package:sloff/services/SloffApi.dart';
 import 'package:sloff/components/SloffModals.dart';
+import 'package:sloff/services/provider/TimerNotifier.dart';
 
 class FocusSuccess extends StatefulWidget {
-  const FocusSuccess({Key key, this.company, this.uuid, this.minutes})
+  const FocusSuccess(
+      {Key key,
+      this.company,
+      this.uuid,
+      this.minutes,
+      this.initialRanking,
+      this.finalRanking,
+      this.name})
       : super(key: key);
 
   final String company;
   final String uuid;
   final int minutes;
+  final int initialRanking;
+  final int finalRanking;
+  final String name;
 
   @override
   _FocusSuccessState createState() => _FocusSuccessState();
@@ -24,14 +36,10 @@ class FocusSuccess extends StatefulWidget {
 class _FocusSuccessState extends State<FocusSuccess> {
   Future initialise;
   var challengeDetails = new Map();
-  String name;
+  bool challengeExists = false;
 
   Future<bool> initialisation() async {
     var token = await FirebaseAuth.instance.currentUser.getIdToken();
-    var query = jsonDecode(await SloffApi.getUser(widget.uuid, token));
-
-    name =
-        '${query["first_name"][0].toUpperCase()}${query["first_name"].substring(1)}';
 
     var challenge = await FirebaseFirestore.instance
         .collection('users_company')
@@ -40,32 +48,45 @@ class _FocusSuccessState extends State<FocusSuccess> {
         .where('visible', isEqualTo: true)
         .get();
 
-    var reward = await FirebaseFirestore.instance
-        .collection('users_company')
-        .doc(widget.company)
-        .collection('challenge')
-        .doc(challenge.docs[0].id)
-        .collection("coupon")
-        .get();
-
-    var time;
-    if (!challenge.docs[0]["group"]) {
-      var query = await FirebaseFirestore.instance
-          .collection('focus')
-          .doc(widget.uuid)
-          .get();
-
-      time = query["available"];
-    } else {
-      time = await SloffApi.getCompanyGroupFocus(companyID: widget.company);
+    if (challenge.docs.length > 0) {
+      challengeExists = true;
     }
 
-    challengeDetails = {
-      "isGroup": challenge.docs[0]["group"],
-      "document": challenge.docs[0],
-      "challengeID": reward.docs[0].id,
-      "time": time
-    };
+    if (challengeExists) {
+      var reward = await FirebaseFirestore.instance
+          .collection('users_company')
+          .doc(widget.company)
+          .collection('challenge')
+          .doc(challenge.docs[0].id)
+          .collection("coupon")
+          .get();
+
+      var time;
+      if (!challenge.docs[0]["group"]) {
+        var query = await FirebaseFirestore.instance
+            .collection('focus')
+            .doc(widget.uuid)
+            .get();
+
+        time = query["available"];
+      } else {
+        var timeQuery = await FirebaseFirestore.instance
+            .collection('users_company')
+            .doc(widget.company)
+            .collection('challenge')
+            .doc(challenge.docs[0].id)
+            .get();
+
+        time = timeQuery['groupFocusMinutes'];
+      }
+
+      challengeDetails = {
+        "isGroup": challenge.docs[0]["group"],
+        "document": challenge.docs[0],
+        "challengeID": reward.docs[0].id,
+        "time": time
+      };
+    }
 
     return true;
   }
@@ -100,7 +121,9 @@ class _FocusSuccessState extends State<FocusSuccess> {
                         Column(
                           children: [
                             Text(
-                                "focus-success-1".tr(namedArgs: {"name": name}),
+                                "focus-success-1".tr(namedArgs: {
+                                  "name": widget.name.capitalize()
+                                }),
                                 style: TextStyle(
                                     color: new Color(0xFF190E3B),
                                     fontFamily: 'Poppins-Regular',
@@ -112,26 +135,28 @@ class _FocusSuccessState extends State<FocusSuccess> {
                                     color: new Color(0xFF190E3B),
                                     fontSize: 14)),
                             Container(height: 10),
-                            Stack(
-                              alignment: Alignment.bottomCenter,
-                              children: [
-                                Transform.scale(
-                                  scale: 0.9,
-                                  child: IgnorePointer(
-                                    child: rewardBuilder(
-                                        challengeDetails["isGroup"],
-                                        context,
-                                        challengeDetails["document"],
-                                        challengeDetails["time"],
-                                        challengeDetails["challengeID"]),
-                                  ),
-                                ),
-                                Text("focus-success-3".tr(),
-                                    style: TextStyle(
-                                        color: new Color(0xFF190E3B),
-                                        fontSize: 14)),
-                              ],
-                            ),
+                            challengeExists
+                                ? Stack(
+                                    alignment: Alignment.bottomCenter,
+                                    children: [
+                                      Transform.scale(
+                                        scale: 0.9,
+                                        child: IgnorePointer(
+                                          child: rewardBuilder(
+                                              challengeDetails["isGroup"],
+                                              context,
+                                              challengeDetails["document"],
+                                              challengeDetails["time"],
+                                              challengeDetails["challengeID"]),
+                                        ),
+                                      ),
+                                      Text("focus-success-3".tr(),
+                                          style: TextStyle(
+                                              color: new Color(0xFF190E3B),
+                                              fontSize: 14)),
+                                    ],
+                                  )
+                                : Container(),
                           ],
                         ),
                         Column(
@@ -177,21 +202,34 @@ class _FocusSuccessState extends State<FocusSuccess> {
                                           fontFamily: 'Poppins-Regular',
                                           fontWeight: FontWeight.bold,
                                           fontSize: 17)),
-                                  Row(
-                                    children: [
-                                      Text("5°",
-                                          style: TextStyle(
-                                              color: new Color(0xFFFF4E4E),
-                                              fontFamily: 'Poppins-Regular',
-                                              fontWeight: FontWeight.bold,
-                                              fontSize: 17)),
-                                      Container(
-                                        width: 5,
-                                      ),
-                                      Icon(Icons.arrow_drop_up_rounded,
-                                          color: new Color(0xFF694EFF))
-                                    ],
-                                  ),
+                                  Consumer<TimerNotifier>(
+                                      builder: (context, data, index) {
+                                    return Row(
+                                      children: [
+                                        Text(
+                                            widget.finalRanking.toString() +
+                                                "°",
+                                            style: TextStyle(
+                                                color: new Color(0xFFFF4E4E),
+                                                fontFamily: 'Poppins-Regular',
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 17)),
+                                        Container(
+                                          width: 5,
+                                        ),
+                                        Icon(
+                                            data.initialRanking <
+                                                    data.finalRanking
+                                                ? Icons.arrow_drop_down_rounded
+                                                : data.initialRanking ==
+                                                        data.finalRanking
+                                                    ? Icons.remove
+                                                    : Icons
+                                                        .arrow_drop_up_rounded,
+                                            color: new Color(0xFF694EFF)),
+                                      ],
+                                    );
+                                  }),
                                 ],
                               ),
                             ),
