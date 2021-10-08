@@ -111,6 +111,7 @@ class _Profile extends State<UserProfile> {
 
   @override
   Widget build(BuildContext context) {
+
     return Stack(children: [
       Consumer<TimerNotifier>(builder: (context, data, index) {
         return Scaffold(
@@ -261,7 +262,7 @@ class _Profile extends State<UserProfile> {
                         child: Container(
                             margin: EdgeInsets.only(bottom: 10),
                             height: 50,
-                            width: MediaQuery.of(context).size.width * 0.8,
+                            width: MediaQuery.of(context).size.width * 0.5,
                             decoration: BoxDecoration(
                                 color: new Color(0xFFffe7c1).withOpacity(.5),
                                 borderRadius: BorderRadius.circular(6)),
@@ -276,27 +277,39 @@ class _Profile extends State<UserProfile> {
                                         SizedBox(
                                           height: 33,
                                           width: 33,
-                                          child: SvgPicture.asset(
-                                              "assets/images/Charts/empty_star.svg"),
+                                          child: data.initialRanking == 1
+                                              ? SvgPicture.asset(
+                                                  "assets/images/Charts/empty_star.svg")
+                                              : Container(),
                                         ),
-                                        Text("1",
+                                        Text(data.initialRanking != 1 ? "#" + data.initialRanking.toString() : data.initialRanking.toString(),
                                             style: TextStyle(
                                                 fontWeight: FontWeight.bold,
-                                                color: Colors.white,
+                                                color: data.initialRanking == 1
+                                                    ? Colors.white
+                                                    : Color(0xFFF2610C),
                                                 fontFamily: "Poppins-Regular",
                                                 fontSize: 16))
                                       ],
                                     ),
                                     Container(width: 10),
-                                    Text(
+                                    /* Text(
                                       "chart-place".tr(),
                                       style: TextStyle(
                                           fontFamily: "Poppins-Regular",
                                           fontWeight: FontWeight.bold,
                                           color: new Color(0xFF190E3B),
                                           fontSize: 15),
-                                    ),
+                                    ), */
                                   ],
+                                ),
+                                Container(
+                                  height: 5,
+                                  width: 5,
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(100),
+                                    color: Color(0xFF190E3B),
+                                  ),
                                 ),
                                 Text(
                                   "ranking".tr(),
@@ -310,7 +323,7 @@ class _Profile extends State<UserProfile> {
                             ))),
 
                     // CO2 savings
-                    Container(
+                    /* Container(
                         height: 30,
                         width: MediaQuery.of(context).size.width * 0.8,
                         decoration: BoxDecoration(
@@ -342,7 +355,7 @@ class _Profile extends State<UserProfile> {
                                     fontWeight: FontWeight.bold, fontSize: 13)),
                             Text("CO3".tr(), style: TextStyle(fontSize: 13)),
                           ],
-                        )),
+                        )), */
                     Container(
                         padding: EdgeInsets.only(top: 20, bottom: 5),
                         child: Row(
@@ -394,7 +407,7 @@ class _Profile extends State<UserProfile> {
                     Visibility(
                       visible: data.redeemedRewards.length <
                                   data.redeemedRewardsQuantity &&
-                              data.redeemedRewardsQuantity != 0
+                              data.redeemedRewards.length > 0
                           ? true
                           : false,
                       child: GestureDetector(
@@ -593,11 +606,7 @@ class _Profile extends State<UserProfile> {
           });
     }
 
-    if (document['visible']) {
-      if (document['valid_until'] != null &&
-          DateTime.now().isAfter(document['valid_until'].toDate())) {
-        return Container();
-      } else {
+    
         return Container(
             color: Colors.transparent,
             child: Coupon(
@@ -620,9 +629,6 @@ class _Profile extends State<UserProfile> {
                 uuid: widget.uuid,
                 fromProfile: true,
                 code: document['code']));
-      }
-    } else {
-      return Container();
-    }
+      
   }
 }

@@ -130,11 +130,11 @@ class _SloffTimerState extends State<SloffTimer>
     return warning;
   }
 
-  static Future<void> alarmCallback() async {
+  Future<void> alarmCallback() async {
     getAndroidWarning().then((androidWarning) async {
       SharedPreferences prefs = await SharedPreferences.getInstance();
 
-      if (!await isLockScreen() && !androidWarning) {
+      if (!await isLockScreen() && !androidWarning && isRunning) {
         NotificationManager n = new NotificationManager();
         n.initNotificationManager();
         n.warningNotification();
@@ -353,6 +353,9 @@ class _SloffTimerState extends State<SloffTimer>
         .collection("focus_stats")
         .doc(today)
         .get();
+
+print(today + "this query existance");
+    print(query.exists.toString() + "this query existance");
 
     if (query.exists) {
       FirebaseFirestore.instance

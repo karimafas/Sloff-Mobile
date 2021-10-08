@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:provider/provider.dart';
 import 'package:sloff/components/Animations.dart';
 import 'package:sloff/components/RectangleButton.dart';
@@ -134,21 +135,18 @@ class _FocusSuccessState extends State<FocusSuccess> {
                                 style: TextStyle(
                                     color: new Color(0xFF190E3B),
                                     fontSize: 14)),
-                            Container(height: 10),
+                            Container(height: 20),
                             challengeExists
                                 ? Stack(
                                     alignment: Alignment.bottomCenter,
                                     children: [
-                                      Transform.scale(
-                                        scale: 0.9,
-                                        child: IgnorePointer(
-                                          child: rewardBuilder(
-                                              challengeDetails["isGroup"],
-                                              context,
-                                              challengeDetails["document"],
-                                              challengeDetails["time"],
-                                              challengeDetails["challengeID"]),
-                                        ),
+                                      IgnorePointer(
+                                        child: rewardBuilder(
+                                            challengeDetails["isGroup"],
+                                            context,
+                                            challengeDetails["document"],
+                                            challengeDetails["time"],
+                                            challengeDetails["challengeID"]),
                                       ),
                                       Text("focus-success-3".tr(),
                                           style: TextStyle(
@@ -204,31 +202,40 @@ class _FocusSuccessState extends State<FocusSuccess> {
                                           fontSize: 17)),
                                   Consumer<TimerNotifier>(
                                       builder: (context, data, index) {
-                                    return Row(
-                                      children: [
-                                        Text(
-                                            widget.finalRanking.toString() +
-                                                "°",
-                                            style: TextStyle(
-                                                color: new Color(0xFFFF4E4E),
-                                                fontFamily: 'Poppins-Regular',
-                                                fontWeight: FontWeight.bold,
-                                                fontSize: 17)),
-                                        Container(
-                                          width: 5,
-                                        ),
-                                        Icon(
-                                            data.initialRanking <
-                                                    data.finalRanking
-                                                ? Icons.arrow_drop_down_rounded
-                                                : data.initialRanking ==
-                                                        data.finalRanking
-                                                    ? Icons.remove
-                                                    : Icons
-                                                        .arrow_drop_up_rounded,
-                                            color: new Color(0xFF694EFF)),
-                                      ],
-                                    );
+                                    return data.finalRanking != null &&
+                                            data.initialRanking != null
+                                        ? Row(
+                                            children: [
+                                              Text(
+                                                  "#" + data.finalRanking.toString(),
+                                                  style: TextStyle(
+                                                      color:
+                                                          new Color(0xFFFF4E4E),
+                                                      fontFamily:
+                                                          'Poppins-Regular',
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      fontSize: 17)),
+                                              Container(
+                                                width: 5,
+                                              ),
+                                              Icon(
+                                                  data.initialRanking <
+                                                          data.finalRanking
+                                                      ? Icons
+                                                          .arrow_drop_down_rounded
+                                                      : data.initialRanking ==
+                                                              data.finalRanking
+                                                          ? Icons.remove
+                                                          : Icons
+                                                              .arrow_drop_up_rounded,
+                                                  color: new Color(0xFF694EFF)),
+                                            ],
+                                          )
+                                        : SpinKitRotatingCircle(
+                                            color: new Color(0xFF190E3B),
+                                            size: 12,
+                                          );
                                   }),
                                 ],
                               ),
@@ -304,6 +311,7 @@ Widget rewardBuilder(bool isGroup, BuildContext context,
     } */
     else {
       coupon = Coupon(
+          scale: 0.9,
           redeemCallback: () {},
           challengeID: challengeID,
           status: 1,

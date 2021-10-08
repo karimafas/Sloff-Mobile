@@ -217,7 +217,8 @@ class _HomePageState extends State<HomePage> {
                                                     uuid: widget.uuid,
                                                     company: widget.company),
                                                 Challenge(
-                                                    goToProfile: navigateToProfile,
+                                                    goToProfile:
+                                                        navigateToProfile,
                                                     uuid: widget.uuid,
                                                     company: widget.company),
                                                 UserProfile(

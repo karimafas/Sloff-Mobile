@@ -13,7 +13,6 @@ import 'package:sloff/components/Background.dart';
 import 'package:sloff/components/FadeNavigation.dart';
 import 'package:sloff/components/RectangleButton.dart';
 import 'package:sloff/global.dart';
-import 'package:toast/toast.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'Onboarding.dart';
 
@@ -374,9 +373,9 @@ class _SignUp2State extends State<SignUp2> {
               .where("email", isEqualTo: widget.email)
               .get();
           if (doc.docs.length == 0) {
-            Toast.show(
+            /* Toast.show(
                 "Il tuo indirizzo email non è collegato a nessuna azienda",
-                context);
+                context); */
           } else {
             String uuid = doc.docs[0].id;
             String company = doc.docs[0].get('company');
@@ -473,7 +472,7 @@ class _SignUp2State extends State<SignUp2> {
             {
               setState(() {
                 isLoading = false;
-                Toast.show("Email already registered.", context);
+                //Toast.show("Email already registered.", context);
               });
             }
             break;
@@ -481,7 +480,7 @@ class _SignUp2State extends State<SignUp2> {
             {
               setState(() {
                 isLoading = false;
-                Toast.show("Check your internet connection.", context);
+                //Toast.show("Check your internet connection.", context);
               });
             }
             break;
@@ -489,7 +488,7 @@ class _SignUp2State extends State<SignUp2> {
             {
               setState(() {
                 isLoading = false;
-                Toast.show("Qualcosa non va", context);
+                //Toast.show("Qualcosa non va", context);
               });
             }
         }

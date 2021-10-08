@@ -5,7 +5,6 @@ import 'package:easy_localization/easy_localization.dart' as e;
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sloff/pages/Onboarding.dart';
-import 'package:toast/toast.dart';
 
 class CambioCausa extends StatefulWidget {
   final String text;
@@ -305,7 +304,7 @@ class _CambioCausa extends State<CambioCausa> {
                                     builder: (context) => OnboardingReady()));
                           }
                           else {
-                            Toast.show("Seleziona una causa.", context);
+                            //Toast.show("Seleziona una causa.", context);
                           }
                         }
                       });

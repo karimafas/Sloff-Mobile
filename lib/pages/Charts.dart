@@ -191,7 +191,7 @@ class _ChartsState extends State<Charts> {
                                         child: Center(child: Icon(Icons.close)),
                                       ),
                                     ),
-                                    Row(
+                                    /* Row(
                                       children: [
                                         SizedBox(
                                             height: 23,
@@ -205,7 +205,7 @@ class _ChartsState extends State<Charts> {
                                                 fontSize: 16,
                                                 fontWeight: FontWeight.bold)),
                                       ],
-                                    )
+                                    ) */
                                   ],
                                 ),
                                 Text("charts".tr(),
@@ -321,7 +321,8 @@ class _ChartsState extends State<Charts> {
                                   // Footer with user info
                                   GestureDetector(
                                     child: Container(
-                                      height: 160,
+                                      padding: EdgeInsets.only(top: 30),
+                                      //height: 140,
                                       decoration: BoxDecoration(
                                           color: new Color(0xFFE4D4F4),
                                           borderRadius: BorderRadius.only(
@@ -337,7 +338,7 @@ class _ChartsState extends State<Charts> {
                                             Row(
                                               children: [
                                                 // Ranking position
-                                                Text("$userRanking°",
+                                                Text("#$userRanking",
                                                     style: TextStyle(
                                                         fontFamily:
                                                             "Poppins-Regular",
@@ -508,7 +509,7 @@ class ChartUserCard extends StatelessWidget {
                               : index == 2
                                   ? "assets/images/Charts/third.svg"
                                   : "")
-                      : Text((index + 1).toString() + "°",
+                      : Text("#" + (index + 1).toString(),
                           textAlign: TextAlign.center,
                           style: TextStyle(
                               color: new Color(0xFFF2610C),

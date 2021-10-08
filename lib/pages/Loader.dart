@@ -128,6 +128,9 @@ class _LoaderState extends State<Loader> {
       }
     }
 
+    Provider.of<TimerNotifier>(context, listen: false)
+        .getInitialRanking(widget.uuid);
+
     await Future.delayed(Duration(seconds: 3));
 
     pushReplacementWithFade(

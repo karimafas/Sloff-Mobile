@@ -3,15 +3,11 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:provider/provider.dart';
 import 'package:sloff/components/AnimatedTextBox.dart';
 import 'package:sloff/components/Animations.dart';
 import 'package:sloff/components/FadeNavigation.dart';
 import 'package:sloff/pages/Loader.dart';
 import 'package:sloff/pages/SignUp.dart';
-import 'package:sloff/pages/HomePage.dart';
-import 'package:sloff/services/provider/TimerNotifier.dart';
-import 'package:toast/toast.dart';
 import 'package:flutter/rendering.dart';
 import 'package:sloff/components/RectangleButton.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -95,9 +91,9 @@ class _Login extends State<Login> with SingleTickerProviderStateMixin {
               .where("email", isEqualTo: _emailController.text)
               .get();
           if (doc.docs.length == 0) {
-            Toast.show(
+            /* Toast.show(
                 "Il tuo indirizzo email non è collegato a nessuna azienda",
-                context);
+                context); */
           } else {
             String uuid = doc.docs[0].id;
             String company = doc.docs[0].get('company');
@@ -183,7 +179,7 @@ class _Login extends State<Login> with SingleTickerProviderStateMixin {
             {
               setState(() {
                 isLoading = false;
-                Toast.show("Controlla la tua connessione a internet.", context);
+                //Toast.show("Controlla la tua connessione a internet.", context);
               });
             }
             break;
@@ -203,7 +199,7 @@ class _Login extends State<Login> with SingleTickerProviderStateMixin {
             {
               setState(() {
                 isLoading = false;
-                Toast.show("Qualcosa è andato storto.", context);
+                //Toast.show("Qualcosa è andato storto.", context);
               });
             }
         }
@@ -215,7 +211,7 @@ class _Login extends State<Login> with SingleTickerProviderStateMixin {
           {
             setState(() {
               isLoading = false;
-              Toast.show("Email not registered.", context);
+             //Toast.show("Email not registered.", context);
               setState(() {
                 _passwordError = false;
                 _emailError = true;
@@ -228,7 +224,7 @@ class _Login extends State<Login> with SingleTickerProviderStateMixin {
           {
             setState(() {
               isLoading = false;
-              Toast.show("Controlla la tua connessione a internet.", context);
+              //Toast.show("Controlla la tua connessione a internet.", context);
             });
           }
           break;
@@ -247,7 +243,7 @@ class _Login extends State<Login> with SingleTickerProviderStateMixin {
           {
             setState(() {
               isLoading = false;
-              Toast.show("Qualcosa è andato storto.", context);
+              //Toast.show("Qualcosa è andato storto.", context);
             });
           }
       }

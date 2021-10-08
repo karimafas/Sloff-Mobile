@@ -27,7 +27,7 @@ class TimerNotifier extends ChangeNotifier {
   String profile_picture;
   DateTime userCreationDt;
   int loadedRewards = 5;
-  var redeemedRewards;
+  List redeemedRewards;
   int redeemedRewardsQuantity = 0;
   int initialRanking;
   int finalRanking;
@@ -53,7 +53,8 @@ class TimerNotifier extends ChangeNotifier {
   Future<void> getInitialRanking(String uuid) async {
     var token = await FirebaseAuth.instance.currentUser.getIdToken();
 
-    initialRanking = jsonDecode(await SloffApi.findRanking(uuid: uuid, token: token));
+    initialRanking =
+        jsonDecode(await SloffApi.findRanking(uuid: uuid, token: token));
 
     notifyListeners();
   }
@@ -61,7 +62,8 @@ class TimerNotifier extends ChangeNotifier {
   Future<void> getFinalRanking(String uuid) async {
     var token = await FirebaseAuth.instance.currentUser.getIdToken();
 
-    finalRanking = jsonDecode(await SloffApi.findRanking(uuid: uuid, token: token));
+    finalRanking =
+        jsonDecode(await SloffApi.findRanking(uuid: uuid, token: token));
 
     notifyListeners();
   }
@@ -88,6 +90,20 @@ class TimerNotifier extends ChangeNotifier {
         .get();
 
     redeemedRewards = query.docs;
+
+    // Redeemed rewards have to be visible and not past expiry date
+
+    List filteredRewards = [];
+
+    redeemedRewards.forEach((element) {
+      if (element['visible'] == true &&
+          (element['valid_until'] == null ||
+          DateTime.now().isBefore(element['valid_until'].toDate()))) {
+        filteredRewards.add(element);
+      }
+    });
+
+    redeemedRewards = filteredRewards;
 
     notifyListeners();
   }
