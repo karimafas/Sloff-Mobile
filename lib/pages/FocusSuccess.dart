@@ -40,8 +40,6 @@ class _FocusSuccessState extends State<FocusSuccess> {
   bool challengeExists = false;
 
   Future<bool> initialisation() async {
-    var token = await FirebaseAuth.instance.currentUser.getIdToken();
-
     var challenge = await FirebaseFirestore.instance
         .collection('users_company')
         .doc(widget.company)
@@ -207,7 +205,9 @@ class _FocusSuccessState extends State<FocusSuccess> {
                                         ? Row(
                                             children: [
                                               Text(
-                                                  "#" + data.finalRanking.toString(),
+                                                  "#" +
+                                                      data.finalRanking
+                                                          .toString(),
                                                   style: TextStyle(
                                                       color:
                                                           new Color(0xFFFF4E4E),
@@ -291,8 +291,9 @@ Widget rewardBuilder(bool isGroup, BuildContext context,
   if (document['visible']) {
     if (document['total_coupon'] <= 0) {
       return Container();
-    } /* else if (document['total_focus'] * 60 <= focusHours) {
+    } else if (document['total_focus'] * 60 <= focusHours) {
       coupon = Coupon(
+          fromSuccess: true,
           redeemCallback: () {},
           challengeID: challengeID,
           status: 3,
@@ -308,9 +309,9 @@ Widget rewardBuilder(bool isGroup, BuildContext context,
           userfocusdetail: focusHours,
           id: document.id,
           totalnumber: document['total_coupon']);
-    } */
-    else {
+    } else {
       coupon = Coupon(
+          fromSuccess: true,
           scale: 0.9,
           redeemCallback: () {},
           challengeID: challengeID,

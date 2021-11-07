@@ -39,6 +39,7 @@ class Coupon extends StatelessWidget {
   final Function redeemCallback;
   final Function deleteCoupon;
   final double scale;
+  final bool fromSuccess;
 
   const Coupon(
       {Key key,
@@ -70,12 +71,16 @@ class Coupon extends StatelessWidget {
       this.validUntil,
       this.useCoupon,
       this.redeemCallback,
-      this.deleteCoupon, this.scale})
+      this.deleteCoupon,
+      this.scale,
+      this.fromSuccess})
       : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     final formatter = new DateFormat('dd-MM-yyyy');
+
+    print("DETAILS $userfocusdetail - $total");
 
     return Stack(
       alignment: Alignment.center,
@@ -128,35 +133,20 @@ class Coupon extends StatelessWidget {
                                       width: 300,
                                       child: Column(
                                         children: [
-                                          GestureDetector(
-                                              behavior:
-                                                  HitTestBehavior.translucent,
-                                              onTap: () async {
-                                                SharedPreferences prefs =
-                                                    await SharedPreferences
-                                                        .getInstance();
-                                                String company =
-                                                    prefs.getString('company');
-                                                String user =
-                                                    prefs.getString('uuid');
-                                              },
-                                              child: Container(
-                                                height: 54,
-                                                width: 54,
-                                                child: Padding(
-                                                  padding:
-                                                      const EdgeInsets.all(12),
-                                                  child: SvgPicture.asset(
-                                                      'assets/images/Coupon/Star.svg',
-                                                      color: Colors.white),
-                                                ),
-                                                decoration: BoxDecoration(
-                                                    color:
-                                                        new Color(0xFF694EFF),
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            100)),
-                                              )),
+                                          Container(
+                                            height: 54,
+                                            width: 54,
+                                            child: Padding(
+                                              padding: const EdgeInsets.all(12),
+                                              child: SvgPicture.asset(
+                                                  'assets/images/Coupon/Star.svg',
+                                                  color: Colors.white),
+                                            ),
+                                            decoration: BoxDecoration(
+                                                color: new Color(0xFF694EFF),
+                                                borderRadius:
+                                                    BorderRadius.circular(100)),
+                                          ),
                                           SizedBox(height: 5),
                                           Container(
                                               padding: EdgeInsets.only(top: 5),
@@ -456,7 +446,6 @@ class Coupon extends StatelessWidget {
                                                                             10),
                                                                 child:
                                                                     LinearPercentIndicator(
-                                                                  //width: MediaQuery.of(context).size.width - 50,
                                                                   animation:
                                                                       true,
                                                                   lineHeight:
@@ -468,7 +457,6 @@ class Coupon extends StatelessWidget {
                                                                           (total *
                                                                               60)) /
                                                                       100,
-                                                                  //center: Text("90.0%"),
                                                                   linearStrokeCap:
                                                                       LinearStrokeCap
                                                                           .roundAll,

@@ -111,7 +111,6 @@ class _Profile extends State<UserProfile> {
 
   @override
   Widget build(BuildContext context) {
-
     return Stack(children: [
       Consumer<TimerNotifier>(builder: (context, data, index) {
         return Scaffold(
@@ -175,10 +174,7 @@ class _Profile extends State<UserProfile> {
                                           Container(
                                             decoration: BoxDecoration(
                                               border: Border.all(
-                                                  color: data.profile_picture !=
-                                                          ""
-                                                      ? new Color(0xFF190E3B)
-                                                      : Colors.transparent,
+                                                  color: new Color(0xFF190E3B),
                                                   width: 3.5),
                                               borderRadius:
                                                   BorderRadius.circular(100),
@@ -190,27 +186,32 @@ class _Profile extends State<UserProfile> {
                                                     height: 100,
                                                     width: 100,
                                                     child: PhysicalModel(
-                                                      clipBehavior: Clip
-                                                          .antiAliasWithSaveLayer,
-                                                      color: Colors.black,
-                                                      shape: BoxShape.circle,
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              100),
-                                                      child: FadeInImage
-                                                          .memoryNetwork(
-                                                        width: MediaQuery.of(
-                                                                    context)
-                                                                .size
-                                                                .width *
-                                                            0.3,
-                                                        image: data
-                                                            .profile_picture,
-                                                        placeholder:
-                                                            kTransparentImage,
-                                                        fit: BoxFit.cover,
-                                                      ),
-                                                    ))),
+                                                        clipBehavior: Clip
+                                                            .antiAliasWithSaveLayer,
+                                                        color: Colors.grey,
+                                                        shape: BoxShape.circle,
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(100),
+                                                        child: data.profile_picture !=
+                                                                ""
+                                                            ? FadeInImage
+                                                                .memoryNetwork(
+                                                                width: MediaQuery.of(
+                                                                            context)
+                                                                        .size
+                                                                        .width *
+                                                                    0.3,
+                                                                image: data
+                                                                    .profile_picture,
+                                                                placeholder:
+                                                                    kTransparentImage,
+                                                                fit: BoxFit
+                                                                    .cover,
+                                                              )
+                                                            : Icon(Icons.person,
+                                                                color: new Color(
+                                                                    0xFF190E3B))))),
                                           ),
                                           loadingImage
                                               ? SizedBox(
@@ -282,7 +283,13 @@ class _Profile extends State<UserProfile> {
                                                   "assets/images/Charts/empty_star.svg")
                                               : Container(),
                                         ),
-                                        Text(data.initialRanking != 1 ? "#" + data.initialRanking.toString() : data.initialRanking.toString(),
+                                        Text(
+                                            data.initialRanking != 1
+                                                ? "#" +
+                                                    data.initialRanking
+                                                        .toString()
+                                                : data.initialRanking
+                                                    .toString(),
                                             style: TextStyle(
                                                 fontWeight: FontWeight.bold,
                                                 color: data.initialRanking == 1
@@ -606,29 +613,27 @@ class _Profile extends State<UserProfile> {
           });
     }
 
-    
-        return Container(
-            color: Colors.transparent,
-            child: Coupon(
-                useCoupon: useCoupon,
-                deleteCoupon: deleteCoupon,
-                challengeID: '',
-                status: 4,
-                isGroup: document['group'],
-                validUntil: document['valid_until'],
-                title: document['title'],
-                text: document['description'],
-                brand: document['brand'],
-                cardReward: document['type'] == 'Libero' ? false : true,
-                value: !document['group'] ? document['value'].toString() : '0',
-                total: document['total_focus'],
-                userfocus: 0,
-                id: document.id,
-                totalnumber: document['total_coupon'],
-                elapsed: document['elapsed_time'],
-                uuid: widget.uuid,
-                fromProfile: true,
-                code: document['code']));
-      
+    return Container(
+        color: Colors.transparent,
+        child: Coupon(
+            useCoupon: useCoupon,
+            deleteCoupon: deleteCoupon,
+            challengeID: '',
+            status: 4,
+            isGroup: document['group'],
+            validUntil: document['valid_until'],
+            title: document['title'],
+            text: document['description'],
+            brand: document['brand'],
+            cardReward: document['type'] == 'Libero' ? false : true,
+            value: !document['group'] ? document['value'].toString() : '0',
+            total: document['total_focus'],
+            userfocus: 0,
+            id: document.id,
+            totalnumber: document['total_coupon'],
+            elapsed: document['elapsed_time'],
+            uuid: widget.uuid,
+            fromProfile: true,
+            code: document['code']));
   }
 }

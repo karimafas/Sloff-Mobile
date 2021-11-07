@@ -24,7 +24,7 @@ class TimerNotifier extends ChangeNotifier {
   // User Data
   String first_name;
   String last_name;
-  String profile_picture;
+  String profile_picture = "";
   DateTime userCreationDt;
   int loadedRewards = 5;
   List redeemedRewards;

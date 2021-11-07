@@ -354,7 +354,7 @@ class _SloffTimerState extends State<SloffTimer>
         .doc(today)
         .get();
 
-print(today + "this query existance");
+    print(today + "this query existance");
     print(query.exists.toString() + "this query existance");
 
     if (query.exists) {
@@ -619,6 +619,8 @@ print(today + "this query existance");
 
     PaintingBinding.instance.imageCache.clear();
     PaintingBinding.instance.imageCache.clearLiveImages();
+
+    AndroidAlarmManager.cancel(0);
   }
 
   @override
