@@ -1,6 +1,4 @@
-import 'dart:convert';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
@@ -8,7 +6,6 @@ import 'package:provider/provider.dart';
 import 'package:sloff/components/Animations.dart';
 import 'package:sloff/components/RectangleButton.dart';
 import 'package:sloff/components/Reward.dart';
-import 'package:sloff/services/SloffApi.dart';
 import 'package:sloff/components/SloffModals.dart';
 import 'package:sloff/services/provider/TimerNotifier.dart';
 
@@ -38,6 +35,7 @@ class _FocusSuccessState extends State<FocusSuccess> {
   Future initialise;
   var challengeDetails = new Map();
   bool challengeExists = false;
+  bool rewardsExist = true;
 
   Future<bool> initialisation() async {
     var challenge = await FirebaseFirestore.instance
@@ -52,7 +50,7 @@ class _FocusSuccessState extends State<FocusSuccess> {
     }
 
     if (challengeExists) {
-      var reward = await FirebaseFirestore.instance
+      var rewardQuery = await FirebaseFirestore.instance
           .collection('users_company')
           .doc(widget.company)
           .collection('challenge')
@@ -60,31 +58,41 @@ class _FocusSuccessState extends State<FocusSuccess> {
           .collection("coupon")
           .get();
 
-      var time;
-      if (!challenge.docs[0]["group"]) {
-        var query = await FirebaseFirestore.instance
-            .collection('focus')
-            .doc(widget.uuid)
-            .get();
+      List rewards = rewardQuery.docs;
 
-        time = query["available"];
-      } else {
-        var timeQuery = await FirebaseFirestore.instance
-            .collection('users_company')
-            .doc(widget.company)
-            .collection('challenge')
-            .doc(challenge.docs[0].id)
-            .get();
+      rewards.forEach((element) {
+        if (element["visible"] == false || element["total_coupon"] < 1) {
+          rewardsExist = false;
+        }
+      });
 
-        time = timeQuery['groupFocusMinutes'];
+      if (rewardsExist) {
+        var time;
+        if (!challenge.docs[0]["group"]) {
+          var query = await FirebaseFirestore.instance
+              .collection('focus')
+              .doc(widget.uuid)
+              .get();
+
+          time = query["available"];
+        } else {
+          var timeQuery = await FirebaseFirestore.instance
+              .collection('users_company')
+              .doc(widget.company)
+              .collection('challenge')
+              .doc(challenge.docs[0].id)
+              .get();
+
+          time = timeQuery['groupFocusMinutes'];
+        }
+
+        challengeDetails = {
+          "isGroup": challenge.docs[0]["group"],
+          "document": challenge.docs[0],
+          "challengeID": rewardQuery.docs[0].id,
+          "time": time
+        };
       }
-
-      challengeDetails = {
-        "isGroup": challenge.docs[0]["group"],
-        "document": challenge.docs[0],
-        "challengeID": reward.docs[0].id,
-        "time": time
-      };
     }
 
     return true;
@@ -134,7 +142,7 @@ class _FocusSuccessState extends State<FocusSuccess> {
                                     color: new Color(0xFF190E3B),
                                     fontSize: 14)),
                             Container(height: 20),
-                            challengeExists
+                            challengeExists && rewardsExist
                                 ? Stack(
                                     alignment: Alignment.bottomCenter,
                                     children: [

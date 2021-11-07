@@ -6,7 +6,6 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:percent_indicator/percent_indicator.dart';
 import 'package:clipboard/clipboard.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class Coupon extends StatelessWidget {
   final String title;
