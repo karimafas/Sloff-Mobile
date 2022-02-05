@@ -2,6 +2,7 @@ import Flutter
 import FirebaseMessaging
 import Firebase
 import CoreMotion
+import CallKit
 
 @available(iOS 10.0, *)
 @UIApplicationMain
@@ -12,6 +13,10 @@ import CoreMotion
     ) -> Bool {
         let controller : FlutterViewController = window?.rootViewController as! FlutterViewController
         let channel = FlutterMethodChannel(name: "swiftTimer", binaryMessenger: controller.binaryMessenger)
+        
+        var isOnPhoneCall: Bool {
+            return CXCallObserver().calls.contains { $0.hasEnded == false }
+        }
         
         var count = 0
         var lastActive = Date()
@@ -67,11 +72,11 @@ import CoreMotion
                     
                     if count < 1
                     {
-                        if Date() > lastActive.addingTimeInterval(4)
+                        if Date() > lastActive.addingTimeInterval(4) && !isOnPhoneCall
                         {
                             center.add(request) { (error) in}
                             count += 1
-
+                            
                             result("EXIT-NOTIFICATION")
                         } else {
                             UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: ["exit-notification"])
